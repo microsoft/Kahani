@@ -8,6 +8,15 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 gradio = "^4.17.0"
+fpdf = "^1.7.2"
+gradio-multimodalchatbot = "^0.0.1"
+openai = "^1.12.0"
+tenacity = "^8.2.3"
+bs4 = "^0.0.2"
+google = "^3.0.0"
+python-dotenv = "^1.0.1"
+transitions = "^0.9.0"
+termcolor = "^2.4.0"
 
 
 [build-system]
