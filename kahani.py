@@ -192,16 +192,6 @@ class Kahani:
             yield "text", chunk
         self.db.story = full_story
         print(colored(f"\n\nStory: {self.db.story}", color='blue'))
-      
-    # def single_character_prompt(self, character, index):
-        
-        # image = SDAPI.text2image(prompt=prompt, seed=0, steps=40)
-        #     # TODO: remove background (model not available)
-        #     # image = SDAPI.remove_background(input_image=image)
-        # if image:
-        #     self.db.characters[index].image = image
-        #     with open(f"character_gen_{index}.png", "wb") as f:
-        #         f.write(base64.b64decode(image))
         
     def generate_character_image(self):
         print(colored('\n\ngenerating character image', color='blue'))
@@ -266,7 +256,7 @@ class Kahani:
                     if c.name == character:
                         c.scenes.append(s)
 
-            self.generate_scene(s)
+            # self.generate_scene(s)
         #     image = self.generate_bounding_box(s)
             
             # character_reference_images = []
@@ -310,49 +300,56 @@ class Kahani:
         if image_data:
             return image_data
         
-    def generate_bounding_box(self, s):
-        print(colored('\n\ngenerating bounding box', color='blue'))
-        backdrop = self.db.scenes[s].backdrop
-        narration = self.db.scenes[s].narration
-        characters = self.db.scenes[s].characters
-        bounding_box = BoundingBoxPrompt(backdrop = backdrop,narration=narration,characters=characters, stream=True, callback=self.print_llm_output)
-        bounding_box = json.loads(bounding_box)
-        for character in self.db.scenes[s].characters:
-            for c in self.db.characters:
-                if c.name == character:
-                    with open(f"scene_{s}_{c.name}_image_pose.png", "wb") as f:
-                        f.write(base64.b64decode(c.image_pose))               
-        image = generate_bb_image(bounding_box,s)
-        return image
+    def generate_bounding_box(self):
+        for s, scene in enumerate(self.db.scenes):
+            print(colored('\n\ngenerating bounding box', color='blue'))
+            backdrop = self.db.scenes[s].backdrop
+            narration = self.db.scenes[s].narration
+            characters = self.db.scenes[s].characters
+            bounding_box = BoundingBoxPrompt(backdrop = backdrop,narration=narration,characters=characters, stream=True, callback=self.print_llm_output)
+            bounding_box = json.loads(bounding_box)
+            # for character in self.db.scenes[s].characters:
+            #     for c in self.db.characters:
+            #         if c.name == character:
+            #             with open(f"scene_{s}_{c.name}_image_pose.png", "wb") as f:
+            #                 f.write(base64.b64decode(c.image_pose))               
+            image = generate_bb_image(bounding_box,s)
+            with open(self.local_dir(f"scene_{s}_bounding_box.png"), "wb") as f:
+                f.write(base64.b64decode(image))
+            yield "file", self.local_dir(f"scene_{s}_bounding_box.png"), "bounding box image for scene"
           
-    def generate_scene(self, s, change=None):
-        print(colored('\n\ngenerating scene', color='blue'))
-        name = f"scene-{s}"
-        character_actions = []
-        for name, action in self.db.scenes[s].characters.items():
-            for i, c in enumerate(self.db.characters):
-                if c.name == name:
-                    character_actions.append(
-                        f"{name} ({c.description}): {action}")
-                    parts = action.split(", ")
-                    # Storing into two variables
-                    if len(parts) >= 2:
-                        pose = parts[0]
-                        facial_expression = ", ".join(parts[1:])
-                    else:
-                        pose, facial_expression = action, "Neutral face expression"
-                    original_prompt = c.prompt
-                    print("name", name)
-                    print("original_prompt", original_prompt)
-                    print("pose", pose)
-                    print("facial_expression", facial_expression)
-                    prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
-                    self.db.characters[i].scene_prompt = prompt
-                    image_data =self.generate_character_pose(c, c.image, narration=prompt)
-                    #TODO : remove background and canny (model not available)
-                    # image_data = SDAPI.remove_background(image_data)
-                    # image_data = self.generate_canny_image(image_data)  
-                    self.db.characters[i].image_pose = image_data
+    def generate_scene(self):
+        for s, scene in enumerate(self.db.scenes):
+            print(colored('\n\ngenerating scene', color='blue'))
+            name = f"scene-{s}"
+            character_actions = []
+            for name, action in self.db.scenes[s].characters.items():
+                for i, c in enumerate(self.db.characters):
+                    if c.name == name:
+                        character_actions.append(
+                            f"{name} ({c.description}): {action}")
+                        parts = action.split(", ")
+                        # Storing into two variables
+                        if len(parts) >= 2:
+                            pose = parts[0]
+                            facial_expression = ", ".join(parts[1:])
+                        else:
+                            pose, facial_expression = action, "Neutral face expression"
+                        original_prompt = c.prompt
+                        print("name", name)
+                        print("original_prompt", original_prompt)
+                        print("pose", pose)
+                        print("facial_expression", facial_expression)
+                        prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
+                        self.db.characters[i].scene_prompt = prompt
+                        image_data =self.generate_character_pose(c, c.image, narration=prompt)
+                        #TODO : remove background and canny (model not available)
+                        # image_data = SDAPI.remove_background(image_data)
+                        # image_data = self.generate_canny_image(image_data)  
+                        self.db.characters[i].image_pose = image_data
+                        with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
+                            f.write(base64.b64decode(image_data))
+                        yield "file", self.local_dir(f"scene{s}_{name}.png"), prompt
     
     def final_scene_generation(self, s, prompt, conditioned_image, character_reference_images):
         if(len(character_reference_images) > 0):

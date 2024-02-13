@@ -31,11 +31,12 @@ def bot(history):
     k = Kahani(local_dir())
     k.input = user_input
     
-    # steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes"]
-    steps = ["write_story", "break_story_into_scenes"]
+    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes","generate_scene"]
+    # steps = ["write_story", "break_story_into_scenes","generate_scene"]
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
+            print("out", out)
             if out[0] == "text":
                 chunk = out[1]
                 history[-1][1] += chunk
@@ -45,6 +46,7 @@ def bot(history):
                 alt_text = out[2]
                 history[-1][1] = (path, alt_text)
                 yield history    
+                # history.append([None, None])
         history.append([None, None])
 
 with gr.Blocks() as demo:
