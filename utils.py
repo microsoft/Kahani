@@ -4,14 +4,15 @@ import numpy as np
 from api import SDAPI
 from io import BytesIO
 
-def generate_bb_image(bounding_box,s):
+def generate_bb_image(bounding_box,s, local_dir):
+    print("generate_bb_image")
     images = []
     dimensions = []
 
     # Load the images of the characters based on the file naming convention
     for box in bounding_box:
         character = box["character"]
-        file_path = f"scene_{s}_{character}_image_pose.png"  # Construct the file path
+        file_path = local_dir(f"scene{s}_{character}.png")  # Construct the file path
         try:
             image = Image.open(file_path)
             if image.mode != 'RGBA':

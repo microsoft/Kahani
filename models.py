@@ -7,7 +7,8 @@ class Scene(BaseModel):
     backdrop: str
     prompt: str = None
     image: str = None
-    characters: dict[str, str] = {}    
+    characters: dict[str, str] = {}  
+    bounding_box: list[dict] = []  
 
 
 class Character(BaseModel):

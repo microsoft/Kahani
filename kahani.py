@@ -11,8 +11,9 @@ from models import Character, Scene, Story
 from dotenv import load_dotenv
 from enum import Enum
 from termcolor import colored
-from utils import final_scene_generation_prompt, generate_bb_image, modify_scene_pose_generation_prompt
+from utils import final_scene_generation_prompt, modify_scene_pose_generation_prompt
 from functools import partial
+from PIL import Image
 load_dotenv()
 
 
@@ -109,7 +110,7 @@ class Kahani:
         full_cultural_context = ""
         for chunk in cultural_context:
             full_cultural_context += chunk
-            yield "text", chunk
+            yield "text", False, chunk
 
         # print(colored('\nsummarizing cultural context\n', color='blue'))
 
@@ -189,7 +190,7 @@ class Kahani:
         full_story = ""
         for chunk in story:
             full_story += chunk
-            yield "text", chunk
+            yield "text", False, chunk
         self.db.story = full_story
         print(colored(f"\n\nStory: {self.db.story}", color='blue'))
         
@@ -200,7 +201,7 @@ class Kahani:
             character_prompt = ""
             for chunk in prompt:
                 character_prompt += chunk
-                yield "text", chunk
+                yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
@@ -210,7 +211,7 @@ class Kahani:
                 self.db.characters[index].image = image
                 with open(self.local_dir(f"character_gen_{index}.png"), "wb") as f:
                     f.write(base64.b64decode(image))
-                yield "file", self.local_dir(f"character_gen_{index}.png"), character_prompt
+                yield "file", True, self.local_dir(f"character_gen_{index}.png"), character_prompt
 
     def extract_characters_from_story(self):
         print(colored('\n\nextracting characters', color='blue'))
@@ -220,7 +221,7 @@ class Kahani:
         character_string=""
         for chunk in characters_generator:
             character_string += chunk
-            yield "text", chunk
+            yield "text", False, chunk
         
         try:
             characters = json.loads(character_string)
@@ -236,7 +237,7 @@ class Kahani:
         full_story_scene = ""
         for chunk in scene_generator:
             full_story_scene += chunk
-            yield "text", chunk
+            yield "text", False, chunk
             
         print("`````")
         print(full_story_scene)
@@ -299,6 +300,49 @@ class Kahani:
         image_data = SDAPI.controlnet(init_images=[image])
         if image_data:
             return image_data
+
+    def generate_bb_image(self):
+        print(colored('\n\ngenerating bounding box for particular scene', color='blue'))
+        for s, scene in enumerate(self.db.scenes):
+            print(colored('\n\ngenerating bounding box', color='blue'))
+            images = []
+            dimensions = []
+            bb_string = self.db.scenes[s].bounding_box
+            narration = self.db.scenes[s].narration
+                # Load the images of the characters based on the file naming convention
+            for box in bb_string:
+                character = box["character"]
+                file_path = self.local_dir(f"scene{s}_{character}.png")  # Construct the file path
+                try:
+                    image = Image.open(file_path)
+                    if image.mode != 'RGBA':
+                        image = image.convert('RGBA')
+                    images.append(image)
+                        # images.append(Image.open(file_path))
+                except FileNotFoundError:
+                    print(f"File {file_path} not found.")
+                    continue  # Skip this iteration if the file is not found
+
+                dimensions.append(box["dimensions"])  # x, y, width, height
+
+            # Create a new image with a black background
+            canvas = Image.new('RGBA', (1280, 960), (0, 0, 0, 255))
+
+                # Resize the images to fit the bounding boxes
+            for i in range(len(images)):
+                images[i] = images[i].resize((dimensions[i][2], dimensions[i][3]))
+
+            # Paste the resized images onto the canvas at the specified coordinates
+            for i in range(len(images)):
+                canvas.paste(images[i], (dimensions[i][0], dimensions[i][1]), images[i])  
+            final_image_path = self.local_dir(f"scene_{s}_bounding_box.png")
+            canvas.save(final_image_path, "PNG")
+            # image = canvas           
+            # with open(self.local_dir(f"scene_{s}_bounding_box.png"), "wb") as f:
+            #     f.write(base64.b64decode(image))
+            yield "file", True, final_image_path, narration
+        
+      
         
     def generate_bounding_box(self):
         for s, scene in enumerate(self.db.scenes):
@@ -307,16 +351,24 @@ class Kahani:
             narration = self.db.scenes[s].narration
             characters = self.db.scenes[s].characters
             bounding_box = BoundingBoxPrompt(backdrop = backdrop,narration=narration,characters=characters, stream=True, callback=self.print_llm_output)
-            bounding_box = json.loads(bounding_box)
+            bb_string = ""
+            for chunk in bounding_box:
+                bb_string += chunk
+                yield "text", False, chunk
+            try:
+                bb_string = json.loads(bb_string)
+                self.db.scenes[s].bounding_box = bb_string
+                print(colored(f"bounding_box: {bb_string}", color='blue'))
+            except Exception as e:
+                print(colored(f"error extracting bounding box: {e}", color='red'))
+            # bb_string = json.loads(bb_string)
             # for character in self.db.scenes[s].characters:
             #     for c in self.db.characters:
             #         if c.name == character:
             #             with open(f"scene_{s}_{c.name}_image_pose.png", "wb") as f:
-            #                 f.write(base64.b64decode(c.image_pose))               
-            image = generate_bb_image(bounding_box,s)
-            with open(self.local_dir(f"scene_{s}_bounding_box.png"), "wb") as f:
-                f.write(base64.b64decode(image))
-            yield "file", self.local_dir(f"scene_{s}_bounding_box.png"), "bounding box image for scene"
+            #                 f.write(base64.b64decode(c.image_pose))  
+            # image = self.generate_bb_image(bb_string, s)
+            
           
     def generate_scene(self):
         for s, scene in enumerate(self.db.scenes):
@@ -349,7 +401,7 @@ class Kahani:
                         self.db.characters[i].image_pose = image_data
                         with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
                             f.write(base64.b64decode(image_data))
-                        yield "file", self.local_dir(f"scene{s}_{name}.png"), prompt
+                        yield "file", True, self.local_dir(f"scene{s}_{name}.png"), prompt
     
     def final_scene_generation(self, s, prompt, conditioned_image, character_reference_images):
         if(len(character_reference_images) > 0):
