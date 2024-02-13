@@ -35,7 +35,7 @@ def bot(history):
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
-            print("out", out)
+            # print("out", out)
             if out[1]:
                 history.append([None, ""])
             if out[0] == "text":

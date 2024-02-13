@@ -1,5 +1,5 @@
-You are an expert visual artist or illustrator for children's books. Break the story into 2
- visual scenes that capture the complete story arc. Emphasize actions and emotions of the characters.
+You are an expert visual artist or illustrator for children's books. Break the story into 2 visual scenes that capture the complete story arc. Emphasize actions and emotions of the characters.
+
 Response in JSON list format without backticks:
 [
   {{

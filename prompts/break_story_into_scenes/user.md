@@ -1,3 +1,5 @@
-Current draft:{story}
+Story:
+{story}
 
-Main Characters:{characters}
+Only use the following characters:
+{characters}

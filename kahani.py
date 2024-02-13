@@ -204,6 +204,9 @@ class Kahani:
                 yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
+
+            yield "text", True, character_prompt
+
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
             # # TODO: remove background (model not available)
             # # image = SDAPI.remove_background(input_image=image)
@@ -366,7 +369,7 @@ class Kahani:
             for character in scene.characters:
                 for c in self.db.characters:
                     if c.name == character:
-                        file_path = f"scene{s}_character_{c.name}.png"
+                        file_path = self.local_dir(f"scene{s}_character_{c.name}.png")
                         with open (file_path, "wb") as f:
                             f.write(base64.b64decode(c.image_pose))
                         character_reference_images.append(file_path)
