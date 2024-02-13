@@ -16,8 +16,10 @@ from uuid import uuid4
 load_dotenv()
 
 user_data = str(uuid4())
-local_dir = partial(os.path.join, os.path.dirname(__file__), "outputs", user_data)
+local_dir = partial(os.path.join, os.path.dirname(
+    __file__), "outputs", user_data)
 os.makedirs(local_dir(), exist_ok=True)
+
 
 def add_text(history, text):
     history = history + [(text, None)]
@@ -30,8 +32,9 @@ def bot(history):
     print("user_input", user_input)
     k = Kahani(local_dir())
     k.input = user_input
-    
-    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes","generate_scene","generate_bounding_box","generate_bb_image","final_scene_generation"]
+
+    steps = ["extract_culture", "write_story", "extract_characters_from_story", "generate_character_image",
+             "break_story_into_scenes", "generate_scene", "generate_bounding_box", "generate_bb_image", "final_scene_generation"]
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
@@ -46,11 +49,13 @@ def bot(history):
                 path = out[2]
                 alt_text = out[3]
                 history[-1][1] = (path, alt_text)
-                yield history    
+                yield history
                 # history.append([None, None])
         history.append([None, None])
 
+
 with gr.Blocks() as demo:
+    gr.Markdown("# Kahani: Under the Hood")
     chatbot = gr.Chatbot(
         [],
         elem_id="chatbot",
@@ -68,7 +73,7 @@ with gr.Blocks() as demo:
             placeholder="Enter text and press enter",
             container=False,
         )
-        
+
     with gr.Row():
         gr.Examples(
             [
@@ -86,4 +91,7 @@ with gr.Blocks() as demo:
 
 demo.queue()
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=8080
+    )

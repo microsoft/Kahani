@@ -203,9 +203,8 @@ class Kahani:
                 character_prompt += chunk
                 yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
-            print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
-            yield "text", True, character_prompt
+            print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
             # # TODO: remove background (model not available)
@@ -397,7 +396,7 @@ class Kahani:
             yield "file", True, self.local_dir(f"final_scene{s}.png"), prompt
         
     def save_db(self):
-        with open('db.json', 'w') as f:
+        with open(self.local_dir('db.json'), 'w') as f:
             f.write(self.db.model_dump_json(exclude_none=True))
 
     def sync_scenes_in_db(self, image, index):
