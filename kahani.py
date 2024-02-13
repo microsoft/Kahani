@@ -256,36 +256,6 @@ class Kahani:
                 for c in self.db.characters:
                     if c.name == character:
                         c.scenes.append(s)
-
-            # self.generate_scene(s)
-        #     image = self.generate_bounding_box(s)
-            
-            # character_reference_images = []
-            # for character in scene.characters:
-            #     for c in self.db.characters:
-            #         if c.name == character:
-            #             file_path = f"scene{s}_pose_test_{c.name}.png"
-            #             with open (file_path, "wb") as f:
-            #                 f.write(base64.b64decode(c.image_pose))
-            #             character_reference_images.append(file_path)
-            
-        #     buffered = BytesIO()
-        #     # Save the image to the buffer in a standard format (PNG/JPEG)
-        #     image.save(buffered, format="PNG")  # Using PNG to support transparency
-
-        #     # Get the byte data from the buffer
-        #     img_byte = buffered.getvalue()
-
-                
-        #     # # Encode the bytes to base64
-        #     img_base64 = base64.b64encode(img_byte).decode("utf-8")
-        #     prompts = []
-        #     for name, action in self.db.scenes[s].characters.items():
-        #         for i, c in enumerate(self.db.characters):
-        #             if c.name == name:
-        #                 prompts.append(c.scene_prompt)
-        #     prompt = final_scene_generation_prompt(prompts,scene.backdrop)            
-        #     self.final_scene_generation(s, prompt, img_base64, character_reference_images)
         
     def generate_character_pose(self, index, image, narration):
         print(colored('\n\ngenerating character pose for particular scene', color='blue'))        
@@ -341,9 +311,7 @@ class Kahani:
             # with open(self.local_dir(f"scene_{s}_bounding_box.png"), "wb") as f:
             #     f.write(base64.b64decode(image))
             yield "file", True, final_image_path, narration
-        
-      
-        
+               
     def generate_bounding_box(self):
         for s, scene in enumerate(self.db.scenes):
             print(colored('\n\ngenerating bounding box', color='blue'))
@@ -361,15 +329,7 @@ class Kahani:
                 print(colored(f"bounding_box: {bb_string}", color='blue'))
             except Exception as e:
                 print(colored(f"error extracting bounding box: {e}", color='red'))
-            # bb_string = json.loads(bb_string)
-            # for character in self.db.scenes[s].characters:
-            #     for c in self.db.characters:
-            #         if c.name == character:
-            #             with open(f"scene_{s}_{c.name}_image_pose.png", "wb") as f:
-            #                 f.write(base64.b64decode(c.image_pose))  
-            # image = self.generate_bb_image(bb_string, s)
-            
-          
+                    
     def generate_scene(self):
         for s, scene in enumerate(self.db.scenes):
             print(colored('\n\ngenerating scene', color='blue'))
@@ -395,23 +355,43 @@ class Kahani:
                         prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
                         self.db.characters[i].scene_prompt = prompt
                         image_data =self.generate_character_pose(c, c.image, narration=prompt)
-                        #TODO : remove background and canny (model not available)
-                        # image_data = SDAPI.remove_background(image_data)
-                        # image_data = self.generate_canny_image(image_data)  
                         self.db.characters[i].image_pose = image_data
                         with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
                             f.write(base64.b64decode(image_data))
                         yield "file", True, self.local_dir(f"scene{s}_{name}.png"), prompt
     
-    def final_scene_generation(self, s, prompt, conditioned_image, character_reference_images):
-        if(len(character_reference_images) > 0):
-            first_ref_img = character_reference_images[0]
-        if(len(character_reference_images) > 1):  
-            second_ref_img = character_reference_images[1]
-        if(len(character_reference_images) == 1):
-            second_ref_img = first_ref_img
-        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=f"{prompt}, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon", seed=0, steps=40)
-        self.db.scenes[s].image = image_data
+    def final_scene_generation(self):
+        for s, scene in enumerate(self.db.scenes):
+            character_reference_images = []
+            for character in scene.characters:
+                for c in self.db.characters:
+                    if c.name == character:
+                        file_path = f"scene{s}_character_{c.name}.png"
+                        with open (file_path, "wb") as f:
+                            f.write(base64.b64decode(c.image_pose))
+                        character_reference_images.append(file_path)
+            prompts = []
+            for name, action in self.db.scenes[s].characters.items():
+                for i, c in enumerate(self.db.characters):
+                    if c.name == name:
+                        prompts.append(c.scene_prompt)
+            prompt = final_scene_generation_prompt(prompts,scene.backdrop)  
+            image_path = self.local_dir(f"scene{s}_bounding_box.png")
+            with open(image_path, "rb") as f:
+                conditioned_image = f.read()
+                conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+            
+            if(len(character_reference_images) > 0):
+                first_ref_img = character_reference_images[0]
+            if(len(character_reference_images) > 1):  
+                second_ref_img = character_reference_images[1]
+            if(len(character_reference_images) == 1):
+                second_ref_img = first_ref_img
+            image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=f"{prompt}, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon", seed=0, steps=40)
+            self.db.scenes[s].image = image_data
+            with open(self.local_dir(f"final_scene{s}.png"), "wb") as f:
+                f.write(base64.b64decode(image_data))
+            yield "file", True, self.local_dir(f"final_scene{s}.png"), prompt
         
     def save_db(self):
         with open('db.json', 'w') as f:

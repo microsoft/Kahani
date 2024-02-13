@@ -31,8 +31,7 @@ def bot(history):
     k = Kahani(local_dir())
     k.input = user_input
     
-    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes","generate_scene","generate_bounding_box","generate_bb_image"]
-    # steps = ["write_story", "break_story_into_scenes","generate_scene"]
+    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes","generate_scene","generate_bounding_box","generate_bb_image","final_scene_generation"]
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
