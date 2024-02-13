@@ -31,7 +31,8 @@ def bot(history):
     k = Kahani(local_dir())
     k.input = user_input
     
-    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes"]
+    # steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes"]
+    steps = ["write_story", "break_story_into_scenes"]
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
@@ -63,6 +64,15 @@ with gr.Blocks() as demo:
             show_label=False,
             placeholder="Enter text and press enter",
             container=False,
+        )
+        
+    with gr.Row():
+        gr.Examples(
+            [
+                "Geetha who loves jamuns and lives in BR Hills",
+                "Roopa lives at the foothills of Dehradun and loves to eat mangoes",
+            ],
+            txt
         )
 
     txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt], queue=False).then(

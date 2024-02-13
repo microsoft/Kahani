@@ -247,6 +247,10 @@ class Kahani:
         for chunk in scene_generator:
             full_story_scene += chunk
             yield "text", chunk
+            
+        print("`````")
+        print(full_story_scene)
+        print("`````")
         
         print(colored(f"full_story_scene: {full_story_scene}", color='blue'))
         try:
