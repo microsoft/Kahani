@@ -1,4 +1,5 @@
 from io import BytesIO
+import os
 from prompts import *
 from pydantic import BaseModel
 from transitions import Machine
@@ -11,6 +12,7 @@ from dotenv import load_dotenv
 from enum import Enum
 from termcolor import colored
 from utils import final_scene_generation_prompt, generate_bb_image, modify_scene_pose_generation_prompt
+from functools import partial
 load_dotenv()
 
 
@@ -32,8 +34,9 @@ class Kahani:
     buffer: list[Change] = []
     input: str = None
 
-    def __init__(self):
+    def __init__(self, outputs: str):
         self.db = Story()
+        self.local_dir = partial(os.path.join, outputs)
 
         states = [
             "start",
@@ -103,17 +106,18 @@ class Kahani:
             cultural_context=self.db.cultural_context,
             user_input=user_input,
             stream=True, callback=self.print_llm_output)
-        
+        full_cultural_context = ""
         for chunk in cultural_context:
-            yield chunk
+            full_cultural_context += chunk
+            yield "text", chunk
 
         # print(colored('\nsummarizing cultural context\n', color='blue'))
 
         # cultural_context = SummariseCulturePrompt(
         #     cultural_context=cultural_context,
         #     stream=True, callback=self.print_llm_output)
-
-        self.db.cultural_context = cultural_context
+        self.db.cultural_context = full_cultural_context
+        print(colored(f"\n\nCultural Context: {self.db.cultural_context}", color='blue'))
         
     def classify_change(self):
         print(colored('\n\nclassifying change', color='blue'))
@@ -182,40 +186,76 @@ class Kahani:
             cultural_context=self.db.cultural_context,
             user_input=user_input,
             stream=True, callback=self.print_llm_output)
-        self.db.story = story
-        self.save_db()
-
+        full_story = ""
+        for chunk in story:
+            full_story += chunk
+            yield "text", chunk
+        self.db.story = full_story
+        print(colored(f"\n\nStory: {self.db.story}", color='blue'))
+      
+    # def single_character_prompt(self, character, index):
+        
+        # image = SDAPI.text2image(prompt=prompt, seed=0, steps=40)
+        #     # TODO: remove background (model not available)
+        #     # image = SDAPI.remove_background(input_image=image)
+        # if image:
+        #     self.db.characters[index].image = image
+        #     with open(f"character_gen_{index}.png", "wb") as f:
+        #         f.write(base64.b64decode(image))
+        
     def generate_character_image(self):
         print(colored('\n\ngenerating character image', color='blue'))
         for index, character in enumerate(self.db.characters):
-            prompt = GenerateCharactersPrompt(description=character.description, stream=True, callback=self.print_llm_output)
-            self.db.characters[index].prompt = prompt
-            image = SDAPI.text2image(prompt=prompt, seed=0, steps=40)
-            # TODO: remove background (model not available)
-            # image = SDAPI.remove_background(input_image=image)
+            prompt =  GenerateCharactersPrompt(description=character.description, stream=True, callback=self.print_llm_output)
+            character_prompt = ""
+            for chunk in prompt:
+                character_prompt += chunk
+                yield "text", chunk
+            self.db.characters[index].prompt = character_prompt
+            print(colored(f"character: {self.db.characters[index]}", color='blue'))
+            image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
+            # # TODO: remove background (model not available)
+            # # image = SDAPI.remove_background(input_image=image)
             if image:
                 self.db.characters[index].image = image
-                with open(f"character_gen_{index}.png", "wb") as f:
+                with open(self.local_dir(f"character_gen_{index}.png"), "wb") as f:
                     f.write(base64.b64decode(image))
+                yield "file", self.local_dir(f"character_gen_{index}.png"), character_prompt
 
     def extract_characters_from_story(self):
         print(colored('\n\nextracting characters', color='blue'))
 
-        characters = ExtractCharactersPrompt(story=self.db.story,
+        characters_generator = ExtractCharactersPrompt(story=self.db.story,
                                              stream=True, callback=self.print_llm_output)
-
-        characters = json.loads(characters)
-
-        self.db.characters = [Character(**c) for c in characters]
-        self.save_db()
-
+        character_string=""
+        for chunk in characters_generator:
+            character_string += chunk
+            yield "text", chunk
+        
+        try:
+            characters = json.loads(character_string)
+            self.db.characters = [Character(**c) for c in characters]
+            print(colored(f"characters: {self.db.characters}", color='blue'))
+        except Exception as e:
+            print(colored(f"error extracting characters: {e}", color='red'))
+    
     def break_story_into_scenes(self):
         print(colored('\n\nbreaking story into scenes', color='blue'))
-        scenes = BreakStoryIntoScenesPrompt(story=self.db.story, characters=[
-                                            c.name for c in self.db.characters], stream=True, callback=self.print_llm_output)
-        scenes = json.loads(scenes)
-        self.db.scenes = [Scene(**s) for s in scenes]
+        scene_generator = BreakStoryIntoScenesPrompt(story=self.db.story, characters=[c.name for c in self.db.characters], stream=True, callback=self.print_llm_output)
         
+        full_story_scene = ""
+        for chunk in scene_generator:
+            full_story_scene += chunk
+            yield "text", chunk
+        
+        print(colored(f"full_story_scene: {full_story_scene}", color='blue'))
+        try:
+            scenes = json.loads(full_story_scene)
+            self.db.scenes = [Scene(**s) for s in scenes]
+            print(colored(f"scenes: {self.db.scenes}", color='blue'))
+        except Exception as e:
+            print(colored(f"error extracting scenes: {e}", color='red'))
+           
         for s, scene in enumerate(self.db.scenes):
             for character in scene.characters:
                 for c in self.db.characters:
@@ -223,34 +263,34 @@ class Kahani:
                         c.scenes.append(s)
 
             self.generate_scene(s)
-            image = self.generate_bounding_box(s)
+        #     image = self.generate_bounding_box(s)
             
-            character_reference_images = []
-            for character in scene.characters:
-                for c in self.db.characters:
-                    if c.name == character:
-                        file_path = f"scene{s}_pose_test_{c.name}.png"
-                        with open (file_path, "wb") as f:
-                            f.write(base64.b64decode(c.image_pose))
-                        character_reference_images.append(file_path)
+            # character_reference_images = []
+            # for character in scene.characters:
+            #     for c in self.db.characters:
+            #         if c.name == character:
+            #             file_path = f"scene{s}_pose_test_{c.name}.png"
+            #             with open (file_path, "wb") as f:
+            #                 f.write(base64.b64decode(c.image_pose))
+            #             character_reference_images.append(file_path)
             
-            buffered = BytesIO()
-            # Save the image to the buffer in a standard format (PNG/JPEG)
-            image.save(buffered, format="PNG")  # Using PNG to support transparency
+        #     buffered = BytesIO()
+        #     # Save the image to the buffer in a standard format (PNG/JPEG)
+        #     image.save(buffered, format="PNG")  # Using PNG to support transparency
 
-            # Get the byte data from the buffer
-            img_byte = buffered.getvalue()
+        #     # Get the byte data from the buffer
+        #     img_byte = buffered.getvalue()
 
                 
-            # # Encode the bytes to base64
-            img_base64 = base64.b64encode(img_byte).decode("utf-8")
-            prompts = []
-            for name, action in self.db.scenes[s].characters.items():
-                for i, c in enumerate(self.db.characters):
-                    if c.name == name:
-                        prompts.append(c.scene_prompt)
-            prompt = final_scene_generation_prompt(prompts,scene.backdrop)            
-            self.final_scene_generation(s, prompt, img_base64, character_reference_images)
+        #     # # Encode the bytes to base64
+        #     img_base64 = base64.b64encode(img_byte).decode("utf-8")
+        #     prompts = []
+        #     for name, action in self.db.scenes[s].characters.items():
+        #         for i, c in enumerate(self.db.characters):
+        #             if c.name == name:
+        #                 prompts.append(c.scene_prompt)
+        #     prompt = final_scene_generation_prompt(prompts,scene.backdrop)            
+        #     self.final_scene_generation(s, prompt, img_base64, character_reference_images)
         
     def generate_character_pose(self, index, image, narration):
         print(colored('\n\ngenerating character pose for particular scene', color='blue'))        
@@ -297,7 +337,12 @@ class Kahani:
                         facial_expression = ", ".join(parts[1:])
                     else:
                         pose, facial_expression = action, "Neutral face expression"
-                    prompt = modify_scene_pose_generation_prompt(original_prompt=c.prompt,pose=pose,facial_expression=facial_expression)
+                    original_prompt = c.prompt
+                    print("name", name)
+                    print("original_prompt", original_prompt)
+                    print("pose", pose)
+                    print("facial_expression", facial_expression)
+                    prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
                     self.db.characters[i].scene_prompt = prompt
                     image_data =self.generate_character_pose(c, c.image, narration=prompt)
                     #TODO : remove background and canny (model not available)

@@ -15,8 +15,9 @@ from api import SDAPI
 from uuid import uuid4
 load_dotenv()
 
-local_dir = partial(os.path.join, os.path.dirname(__file__), "outputs")
-
+user_data = str(uuid4())
+local_dir = partial(os.path.join, os.path.dirname(__file__), "outputs", user_data)
+os.makedirs(local_dir(), exist_ok=True)
 
 def add_text(history, text):
     history = history + [(text, None)]
@@ -26,27 +27,24 @@ def add_text(history, text):
 def bot(history):
     user_input = history[-1][0]
     history[-1][1] = ""
-
-    k = Kahani()
+    print("user_input", user_input)
+    k = Kahani(local_dir())
     k.input = user_input
-
-    for chunk in k.extract_culture():
-        history[-1][1] += chunk
-        yield history
-
-    history.append([None, None])
-    history[-1][1] = "... Generating Image ..."
-    yield history
-
-    prompt = "small girl in the forest, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
-    out = SDAPI.text2image(prompt=prompt)
-    out = base64.b64decode(out)
-    out = PIL.Image.open(io.BytesIO(out))
-    path = local_dir(f"{uuid4()}.png")
-    out.save(path, 'PNG')
-    history[-1][1] = (path, prompt)
-    yield history
-
+    
+    steps = ["extract_culture", "write_story", "extract_characters_from_story","generate_character_image","break_story_into_scenes"]
+    for step in steps:
+        history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
+        for out in getattr(k, step)():
+            if out[0] == "text":
+                chunk = out[1]
+                history[-1][1] += chunk
+                yield history
+            elif out[0] == "file":
+                path = out[1]
+                alt_text = out[2]
+                history[-1][1] = (path, alt_text)
+                yield history    
+        history.append([None, None])
 
 with gr.Blocks() as demo:
     chatbot = gr.Chatbot(
@@ -55,7 +53,8 @@ with gr.Blocks() as demo:
         bubble_full_width=False,
         avatar_images=(
             None, (os.path.join(os.path.dirname(__file__), "avatar.png"))),
-        likeable=False
+        likeable=False,
+        height=600
     )
 
     with gr.Row():

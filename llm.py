@@ -9,10 +9,10 @@ from bs4 import BeautifulSoup
 import urllib.parse
 
 
-@retry(wait=wait_random_exponential(
-    multiplier=10,
-    max=120),
-    stop=stop_after_attempt(5))
+# @retry(wait=wait_random_exponential(
+#     multiplier=10,
+#     max=120),
+    # stop=stop_after_attempt(5))
 def llm(messages, **kwargs):
     client = openai.Client(
         api_key=os.environ["OPENAI_API_KEY"],
