@@ -201,7 +201,7 @@ class Kahani:
             character_prompt = ""
             for chunk in prompt:
                 character_prompt += chunk
-                yield "text", False, chunk
+                # yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
 
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
@@ -378,7 +378,7 @@ class Kahani:
                     if c.name == name:
                         prompts.append(c.scene_prompt)
             prompt = final_scene_generation_prompt(prompts,scene.backdrop)  
-            image_path = self.local_dir(f"scene{s}_bounding_box.png")
+            image_path = self.local_dir(f"scene_{s}_bounding_box.png")
             with open(image_path, "rb") as f:
                 conditioned_image = f.read()
                 conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
