@@ -389,7 +389,7 @@ class Kahani:
                 second_ref_img = character_reference_images[1]
             if(len(character_reference_images) == 1):
                 second_ref_img = first_ref_img
-            image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=f"{prompt}, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon", seed=0, steps=40)
+            image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
             self.db.scenes[s].image = image_data
             with open(self.local_dir(f"final_scene{s}.png"), "wb") as f:
                 f.write(base64.b64decode(image_data))
