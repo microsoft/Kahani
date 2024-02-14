@@ -77,8 +77,9 @@ with gr.Blocks() as demo:
     with gr.Row():
         gr.Examples(
             [
-                "Geetha who loves jamuns and lives in BR Hills",
-                "Roopa lives at the foothills of Dehradun and loves to eat mangoes",
+                "Write a story about Geetha who loves jamuns and lives in BR Hills",
+                "Write a story about Roopa lives at the foothills of Dehradun and loves to eat mangoes",
+                "Write a story about Bala and his pet dog simba on Marina beach"
             ],
             txt
         )
