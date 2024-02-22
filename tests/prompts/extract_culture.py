@@ -20,18 +20,4 @@ class TestExtractCulture(TestCase):
 
         print(out)
 
-#     def test_update(self):
-#         out = ExtractCulturePrompt(
-#             cultural_context="""
-# - Salma might be of Middle Eastern or South Asian descent, as "Abu" can signify father or paternal grandfather in Arabic or a term of endearment.
-# - The term suggests a close family bond, respecting elders.
-# - Visiting family during summer holidays could indicate the importance of family unity and spending time with extended family in her culture.
-# - Enjoyment of warm weather might imply she's accustomed to or culturally aligns with a hot climate.""",
-#             user_input="Salma likes to eat kulfis",
-#             debug=True
-#         )
-
-#         print(out)
-
         self.assertIn("Moocha", out)
-        # self.assertIn("Arabic", out)

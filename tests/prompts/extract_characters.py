@@ -7,28 +7,30 @@ class TestExtractCharacters(TestCase):
     
         def test_empty(self):
             out = ExtractCharactersPrompt(
-                user_input="""Once upon a time, in a lush jungle kingdom, there lived a mighty ruler named King Moocha Raja. His palace was grand, and his heart, kind. One sunny afternoon, a clever little monkey spied an open window to the king's chamber and thought it the perfect chance for an adventure.
+                story="""Once upon a wave-kissed time, in the snug coastal village near Kovalam Beach, there lived a cheerful girl named Sruthi. With twinkling eyes and a heart as warm as the sun that danced on the ocean waves, Sruthi was famous for two things: her love for the sweet, sticky halwa and her boundless kindness. 
 
-Sneaking inside, the monkey discovered King Moocha Raja fast asleep, snoring louder than a thunderstorm! Quietly, the monkey picked up a large palm leaf and began to fan the sleeping king. The cool breeze was so pleasant that the king slept more peacefully than ever before.
+Sruthi's halwa was not just a treat; it was a ribbon of joy woven through the community. Made with love, sprinkled with cardamom, and filled with cashews, it melted in your mouth as magically as a golden sunset melt into the sea. 
 
-When he awoke, King Moocha Raja was surprised to see his new furry friend. He chuckled with delight and named the monkey Munchkin. The king and Munchkin quickly became the best of pals. Every day the monkey entertained the king with acrobatic tricks and was rewarded with juicy fruits and tiny royal clothes.
+One sun-splashed day, as Sruthi strolled home with a batch of fresh halwa, she noticed her new neighbor—a shy, elderly man named Kumar uncle—watching the playful seagulls from his lonely porch. Sruthi's heart whispered like the gentle waves, "Atithi Devo Bhava." 
 
-But not everyone was pleased. The king’s ministers scowled at the monkey, not liking the special attention he received.
+With a knock as soft as the sea breeze, Sruthi stood at Kumar uncle's door, offering a plate piled high with halwa. His eyes twinkled, much like hers, as an unexpected smile found its way to his lips. "Oh, what delightful halwa! Thank you, my dear," he said, tasting not just the sweetness of the halwa but the sweetness of companionship. 
 
-One ill-fated morning, as Munchkin and the king were playing in the royal chambers, a mischievous fly buzzed around the king's nose. Trying to help, Munchkin aimed to swat the fly away but accidentally thumped the king’s nose instead!
+From then on, Kumar uncle wasn't just a neighbor; he was part of Sruthi's extended family. They would share stories of the sea, bask in the balmy breeze, and of course, relish halwa together. Sruthi's kind gesture rippled through the village, reminding everyone that a little sweetness goes a long way—not just the kind you eat, but the kind you live. 
 
-"Ouch!" howled the king, his nose red with surprise and anger. "Away with you!" he commanded, feeling betrayed.
-
-Munchkin's heart sank, and with a sad little squeak, he scampered away.
-
-Time passed, and King Moocha Raja's nose healed, but his heart ached for his dear friend. He realized his rash decision was too harsh. The king ordered a search for Munchkin, but the monkey was nowhere to be found.
-
-Finally, the king went to the open window and called out, “Munchkin, my friend, if you are near, know that I am sorry!”
-
-To his joy, Munchkin emerged from a nearby tree. The king welcomed him back with a warm hug, promising always to be a fair and kind friend.
-
-And so, King Moocha Raja and Munchkin were reunited, sharing many more days of laughter and friendship in the grand kingdom, where every window stayed open, just in case.""",
-                debug=True
+And so, embraced by the coconut palms and sung to by the waves, Sruthi and her neighbors wove a tapestry of kindness that was as delightful and enduring as Kovalam's very own sandy shores. """,
+                debug=True,
+                stream=True
             )
-    
-            print(out)
+
+            for chunk in out:
+                print(chunk, end="")
+
+        # def test_empty(self):
+        #     out = ExtractCharactersPrompt(
+        #         story="""In a village woven into the green embrace of the Skandagiri Hills lived a little girl named Geetha. She had a smile like the sun breaking through the clouds, and her heart was full of more kindness than the river was of water.One day, while wandering near the edge of the forest, Geetha came across a gentle elephant trapped in a thorny bush. It trumpeted softly, its large eyes filled with worry. Without a second thought, Geetha carefully helped free the elephant from the snare."Thank you," rumbled the elephant, who could speak the language of the heart. "I am Ananda, and I will not forget your kindness."That night, as Geetha sat outside her home, a soft light flickered near her. A firefly, glowing like a tiny star, danced in the air."I am Tara," the firefly buzzed, "I saw what you did for Ananda. You have a beautiful heart." From then on, Ananda and Tara became Geetha's faithful friends. They played hide and seek among the trees, and Tara lit up their path with her radiant light. Geetha shared stories of her village, taught Ananda village songs, and weaved flower garlands for Tara to wear.The villagers often spoke of the trio's friendship, a testament to the nobility of kindness. "When we offer help without expecting anything," Geetha said, "friendship blooms like the lotus in the muddy waters. Friendship is the greatest treasure." And under the vast dome of the Southern Indian sky, amid the chorus of crickets and the whisper of the trees, the bonds of an unexpected friendship grew, teaching everyone around that in the heart of their biodiverse home, kindness was a language that all creatures understood.""",
+        #         debug=True,
+        #         stream=True
+        #     )
+
+        #     for chunk in out:
+        #         print(chunk, end="")
