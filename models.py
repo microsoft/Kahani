@@ -16,9 +16,9 @@ class Character(BaseModel):
     name: str
     description: str
     prompt: str = None
-    scene_prompt: str = None
+    scene_prompt: list[str] = ["", ""]
     image: str = None
-    image_pose: str = None
+    image_pose: list[str] = ["", ""]
     scenes: list[int] = []    
 
 

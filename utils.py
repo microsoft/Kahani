@@ -45,9 +45,11 @@ def modify_scene_pose_generation_prompt(original_prompt, pose, facial_expression
     final_prompt = modified_prompt_corrected.replace(", looking at the camera", "")
     return final_prompt
     
-def final_scene_generation_prompt(prompts,backdrop):
+def final_scene_generation_prompt(names, prompts):
     substring_to_remove = "(Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
     processed_prompts = [prompt.split(substring_to_remove)[0] for prompt in prompts]
-    concatenated_prompts = ", ".join(processed_prompts)
-    concatenated_prompts  = concatenated_prompts + substring_to_remove + ", " + backdrop
-    return concatenated_prompts
+    result = []
+    for name, prompt in zip(names, processed_prompts):
+        result.append({"name": name, "description": prompt})
+
+    return result

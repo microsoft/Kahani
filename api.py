@@ -211,7 +211,7 @@ class SDAPI:
 
 
         print("remove_background")
-        response = requests.post(HOST + "/rembg", json=kwargs)
+        response = requests.post(HOST + "/rembg", json=defaults)
         if response.status_code == 200:
             body = response.json()
             return body['image']

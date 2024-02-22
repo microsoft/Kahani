@@ -1,3 +1,4 @@
+import ast
 from io import BytesIO
 import os
 from prompts import *
@@ -39,55 +40,55 @@ class Kahani:
         self.db = Story()
         self.local_dir = partial(os.path.join, outputs)
 
-        states = [
-            "start",
-            "update_culture",
+        # states = [
+        #     "start",
+        #     "update_culture",
 
-            "create_story",
-            "extract_characters",
-            "generate_character_image",
-            "extract_scenes",
+        #     "create_story",
+        #     "extract_characters",
+        #     "generate_character_image",
+        #     "extract_scenes",
 
-            "classify_change",
-            "update_dependencies",
+        #     "classify_change",
+        #     "update_dependencies",
 
-            "process_changes",
-            "done"
-        ]
+        #     "process_changes",
+        #     "done"
+        # ]
 
-        transitions = [
-            {"trigger": "advance", "source": "start",
-                "dest": "update_culture", 'after': 'extract_culture'},
+        # transitions = [
+        #     {"trigger": "advance", "source": "start",
+        #         "dest": "update_culture", 'after': 'extract_culture'},
 
-            {"trigger": "advance", "source": "update_culture",
-                "dest": "create_story", "conditions": "is_story_empty", 'after': 'write_story'},
-            {"trigger": "advance", "source": "create_story",
-                "dest": "extract_characters", 'after': 'extract_characters_from_story'},
-            {"trigger": "advance", "source": "extract_characters",
-                "dest": "generate_character_image", 'after': 'generate_character_image'},
-            {"trigger": "advance", "source": "generate_character_image",
-                "dest": "extract_scenes", 'after': 'break_story_into_scenes'},
-            # {"trigger": "advance", "source": "extract_scenes",
-            #     "dest": "process_changes", "after": "process_changes"},
+        #     {"trigger": "advance", "source": "update_culture",
+        #         "dest": "create_story", "conditions": "is_story_empty", 'after': 'write_story'},
+        #     {"trigger": "advance", "source": "create_story",
+        #         "dest": "extract_characters", 'after': 'extract_characters_from_story'},
+        #     {"trigger": "advance", "source": "extract_characters",
+        #         "dest": "generate_character_image", 'after': 'generate_character_image'},
+        #     {"trigger": "advance", "source": "generate_character_image",
+        #         "dest": "extract_scenes", 'after': 'break_story_into_scenes'},
+        #     # {"trigger": "advance", "source": "extract_scenes",
+        #     #     "dest": "process_changes", "after": "process_changes"},
             
-            # {"trigger": "advance", "source": "update_culture",
-            #     "dest": "classify_change", 'after': 'classify_change'},
-            # {"trigger": "advance", "source": "classify_change",
-            #     "dest": "update_dependencies", "after": "update_dependencies"},
-            # {"trigger": "advance", "source": "update_dependencies",
-            #     "dest": "process_changes", "after": "process_changes"},
+        #     # {"trigger": "advance", "source": "update_culture",
+        #     #     "dest": "classify_change", 'after': 'classify_change'},
+        #     # {"trigger": "advance", "source": "classify_change",
+        #     #     "dest": "update_dependencies", "after": "update_dependencies"},
+        #     # {"trigger": "advance", "source": "update_dependencies",
+        #     #     "dest": "process_changes", "after": "process_changes"},
 
-            # {"trigger": "advance", "source": "process_changes",
-            #     "dest": "process_changes", "conditions": "are_changes_pending", "after": "process_changes"},
-            {"trigger": "advance", "source": "extract_scenes",
-                "dest": "done", "before": 'save_db'},
+        #     # {"trigger": "advance", "source": "process_changes",
+        #     #     "dest": "process_changes", "conditions": "are_changes_pending", "after": "process_changes"},
+        #     {"trigger": "advance", "source": "extract_scenes",
+        #         "dest": "done", "before": 'save_db'},
 
-            {"trigger": "reset", "source": "*", "dest": "start"},
+        #     {"trigger": "reset", "source": "*", "dest": "start"},
 
-        ]
+        # ]
 
-        Machine(model=self, states=states,
-                transitions=transitions, initial=states[0])
+        # Machine(model=self, states=states,
+        #         transitions=transitions, initial=states[0])
 
     def print_llm_output(self, output):
         print(colored(output, color='yellow'), end='')
@@ -201,14 +202,13 @@ class Kahani:
             character_prompt = ""
             for chunk in prompt:
                 character_prompt += chunk
-                # yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
 
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
             # # TODO: remove background (model not available)
-            # # image = SDAPI.remove_background(input_image=image)
+            image = SDAPI.remove_background(image=image)
             if image:
                 self.db.characters[index].image = image
                 with open(self.local_dir(f"character_gen_{index}.png"), "wb") as f:
@@ -228,7 +228,6 @@ class Kahani:
         try:
             characters = json.loads(character_string)
             self.db.characters = [Character(**c) for c in characters]
-            print(colored(f"characters: {self.db.characters}", color='blue'))
         except Exception as e:
             print(colored(f"error extracting characters: {e}", color='red'))
     
@@ -240,12 +239,7 @@ class Kahani:
         for chunk in scene_generator:
             full_story_scene += chunk
             yield "text", False, chunk
-            
-        print("`````")
-        print(full_story_scene)
-        print("`````")
         
-        print(colored(f"full_story_scene: {full_story_scene}", color='blue'))
         try:
             scenes = json.loads(full_story_scene)
             self.db.scenes = [Scene(**s) for s in scenes]
@@ -295,7 +289,25 @@ class Kahani:
                     print(f"File {file_path} not found.")
                     continue  # Skip this iteration if the file is not found
 
-                dimensions.append(box["dimensions"])  # x, y, width, height
+                # dimensions.append(box["dimensions"])  # x, y, width, height
+                # dimensions.append([
+                #     int(box["dimensions"][0]),
+                #     int(box["dimensions"][1]),
+                #     int(box["dimensions"][2]),
+                #     int(box["dimensions"][3])
+                # ])
+                dimensions_str = box["dimensions"]
+                if isinstance(dimensions_str, str):
+                    dimensions_list = ast.literal_eval(dimensions_str)
+                else:
+                    dimensions_list = dimensions_str
+
+                dimensions.append([
+                    int(dimensions_list[0]),
+                    int(dimensions_list[1]),
+                    int(dimensions_list[2]),
+                    int(dimensions_list[3])
+                ])
 
             # Create a new image with a black background
             canvas = Image.new('RGBA', (1280, 960), (0, 0, 0, 255))
@@ -320,6 +332,10 @@ class Kahani:
             backdrop = self.db.scenes[s].backdrop
             narration = self.db.scenes[s].narration
             characters = self.db.scenes[s].characters
+            print("inside bounding box generation function")
+            # print("backdrop", backdrop)
+            # print("narration", narration)
+            # print("characters", characters)
             bounding_box = BoundingBoxPrompt(backdrop = backdrop,narration=narration,characters=characters, stream=True, callback=self.print_llm_output)
             bb_string = ""
             for chunk in bounding_box:
@@ -355,9 +371,10 @@ class Kahani:
                         print("pose", pose)
                         print("facial_expression", facial_expression)
                         prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
-                        self.db.characters[i].scene_prompt = prompt
+                        self.db.characters[i].scene_prompt[s] = prompt
                         image_data =self.generate_character_pose(c, c.image, narration=prompt)
-                        self.db.characters[i].image_pose = image_data
+                        image_data = SDAPI.remove_background(image=image_data)
+                        self.db.characters[i].image_pose[s] = image_data
                         with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
                             f.write(base64.b64decode(image_data))
                         yield "file", True, self.local_dir(f"scene{s}_{name}.png"), prompt
@@ -370,18 +387,30 @@ class Kahani:
                     if c.name == character:
                         file_path = self.local_dir(f"scene{s}_character_{c.name}.png")
                         with open (file_path, "wb") as f:
-                            f.write(base64.b64decode(c.image_pose))
+                            f.write(base64.b64decode(c.image_pose[s]))
                         character_reference_images.append(file_path)
+            names = []
             prompts = []
             for name, action in self.db.scenes[s].characters.items():
                 for i, c in enumerate(self.db.characters):
                     if c.name == name:
-                        prompts.append(c.scene_prompt)
-            prompt = final_scene_generation_prompt(prompts,scene.backdrop)  
+                        names.append(name)
+                        prompts.append(c.scene_prompt[s])
+            print("this is the scene prompt taken for final scene genration", prompts)
+            prompt = final_scene_generation_prompt(names, prompts) 
+            backdrop = self.db.scenes[s].backdrop
+            narration = self.db.scenes[s].narration
+            final_prompt = GenerateScenesPrompt(characters=prompt, narration=narration, backdrop=backdrop, stream=True, callback=self.print_llm_output) 
+            full_final_prompt = ""
+            for chunk in final_prompt:
+                full_final_prompt += chunk
+            print("final_prompt", full_final_prompt)
             image_path = self.local_dir(f"scene_{s}_bounding_box.png")
             with open(image_path, "rb") as f:
                 conditioned_image = f.read()
                 conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+            print("calling controlnet here for canny bb")
+            reference_canny_img = SDAPI.controlnet(init_images=[conditioned_image])
             
             if(len(character_reference_images) > 0):
                 first_ref_img = character_reference_images[0]
@@ -389,11 +418,13 @@ class Kahani:
                 second_ref_img = character_reference_images[1]
             if(len(character_reference_images) == 1):
                 second_ref_img = first_ref_img
-            image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+            print("calling API here")
+            print("final prompt input", full_final_prompt)
+            image_data = SDAPI.reference_image(conditioned_image=reference_canny_img,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=full_final_prompt, seed=0, steps=40)
             self.db.scenes[s].image = image_data
             with open(self.local_dir(f"final_scene{s}.png"), "wb") as f:
                 f.write(base64.b64decode(image_data))
-            yield "file", True, self.local_dir(f"final_scene{s}.png"), prompt
+            yield "file", True, self.local_dir(f"final_scene{s}.png"), full_final_prompt
         
     def save_db(self):
         with open(self.local_dir('db.json'), 'w') as f:
