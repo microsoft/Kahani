@@ -235,7 +235,7 @@ class SDAPI:
         if "steps" not in kwargs:
             kwargs["steps"] = 40
 
-        # kwargs['sd_model_hash'] = "31e35c80fc"
+        kwargs['sd_model_hash'] = "31e35c80fc"
         kwargs['sd_model_name'] = "sd_xl_base_1.0"
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
@@ -243,8 +243,8 @@ class SDAPI:
 
         # kwargs['sd_vae_hash'] = None
         # kwargs['sd_vae_name'] = "sdxl_vae"
-        kwargs['refiner_checkpoint'] = "7440042bbd"
-        kwargs['refiner_switch_at'] = 0.8
+        # kwargs['refiner_checkpoint'] = "7440042bbd"
+        # kwargs['refiner_switch_at'] = 0.8
         kwargs['alwayson_scripts'] = {}
         kwargs['alwayson_scripts']['controlnet'] = {}
         kwargs['alwayson_scripts']['controlnet']['args'] = [
@@ -268,7 +268,6 @@ class SDAPI:
                 "module": "reference_only",
                 "model": "none",
                 "weight": 1,
-                "preprocessor": "None",
                 "image": first_ref_image,
                 "resize_mode": "Just Resize",
                 "lowvram": False,
@@ -276,7 +275,7 @@ class SDAPI:
                 "guidance_start": 0.0,
                 "guidance_end": 1.0,
                 "control_mode": "Balanced",
-                "pixel_perfect": False,
+                "pixel_perfect": True,
                 "save_detected_map": True,
             },
             {
@@ -284,7 +283,6 @@ class SDAPI:
                 "module": "reference_only",
                 "model": "none",
                 "weight": 1,
-                "preprocessor": "None",
                 "image": second_ref_image,
                 "resize_mode": "Just Resize",
                 "lowvram": False,
@@ -292,7 +290,7 @@ class SDAPI:
                 "guidance_start": 0.0,
                 "guidance_end": 1.0,
                 "control_mode": "Balanced",
-                "pixel_perfect": False,
+                "pixel_perfect": True,
                 "save_detected_map": True,
             }
         ]
