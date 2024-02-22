@@ -13,16 +13,24 @@ load_dotenv()
 class TestReferenceGuidedInpainting(TestCase):
     #image generation from reference image
      def test_empty(self):   
-        with open('prompt.txt', 'r') as file:
-            prompt = file.read().strip()
+        prompt = """Girl and Monkey,(young girl with bright eyes,colorful skirt, joyous demeanor,(marching with basket:1.2)),(mischievous monkey,(hanging from a tree branch, holding a jamun with a cheeky grin:1.2)),(lush forest path leading to a heavy laden jamun tree, sunlight filtering through the leaves, nearby stream with clear water),(Kids illustration, Pixar style:1.2)), masterpiece, sharp focus, highly detailed, cartoon"""
+
+        with open("canny_bb.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
         
-        with open("reference_scene_image.png", "rb") as f:
-            img_data = f.read()
-            img_data = base64.b64encode(img_data).decode("utf-8")
+        with open("scene0_Geetha-removebg-preview.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
         
-        out = SDAPI.reference_image(prompt=prompt,init_images=[img_data] )
-        img_data = base64.b64decode(out)
-        with open(f"output.png", "wb") as f:
+        with open("scene1_Mr._Monkey-removebg-preview.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")
+        
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+
+        img_data = base64.b64decode(image_data)
+        with open(f"final_scene_testing.png", "wb") as f:
             f.write(img_data) 
           
            
