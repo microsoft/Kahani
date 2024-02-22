@@ -40,56 +40,6 @@ class Kahani:
         self.db = Story()
         self.local_dir = partial(os.path.join, outputs)
 
-        # states = [
-        #     "start",
-        #     "update_culture",
-
-        #     "create_story",
-        #     "extract_characters",
-        #     "generate_character_image",
-        #     "extract_scenes",
-
-        #     "classify_change",
-        #     "update_dependencies",
-
-        #     "process_changes",
-        #     "done"
-        # ]
-
-        # transitions = [
-        #     {"trigger": "advance", "source": "start",
-        #         "dest": "update_culture", 'after': 'extract_culture'},
-
-        #     {"trigger": "advance", "source": "update_culture",
-        #         "dest": "create_story", "conditions": "is_story_empty", 'after': 'write_story'},
-        #     {"trigger": "advance", "source": "create_story",
-        #         "dest": "extract_characters", 'after': 'extract_characters_from_story'},
-        #     {"trigger": "advance", "source": "extract_characters",
-        #         "dest": "generate_character_image", 'after': 'generate_character_image'},
-        #     {"trigger": "advance", "source": "generate_character_image",
-        #         "dest": "extract_scenes", 'after': 'break_story_into_scenes'},
-        #     # {"trigger": "advance", "source": "extract_scenes",
-        #     #     "dest": "process_changes", "after": "process_changes"},
-            
-        #     # {"trigger": "advance", "source": "update_culture",
-        #     #     "dest": "classify_change", 'after': 'classify_change'},
-        #     # {"trigger": "advance", "source": "classify_change",
-        #     #     "dest": "update_dependencies", "after": "update_dependencies"},
-        #     # {"trigger": "advance", "source": "update_dependencies",
-        #     #     "dest": "process_changes", "after": "process_changes"},
-
-        #     # {"trigger": "advance", "source": "process_changes",
-        #     #     "dest": "process_changes", "conditions": "are_changes_pending", "after": "process_changes"},
-        #     {"trigger": "advance", "source": "extract_scenes",
-        #         "dest": "done", "before": 'save_db'},
-
-        #     {"trigger": "reset", "source": "*", "dest": "start"},
-
-        # ]
-
-        # Machine(model=self, states=states,
-        #         transitions=transitions, initial=states[0])
-
     def print_llm_output(self, output):
         print(colored(output, color='yellow'), end='')
 
@@ -207,7 +157,6 @@ class Kahani:
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
-            # # TODO: remove background (model not available)
             image = SDAPI.remove_background(image=image)
             if image:
                 self.db.characters[index].image = image
@@ -256,8 +205,6 @@ class Kahani:
     def generate_character_pose(self, index, image, narration):
         print(colored('\n\ngenerating character pose for particular scene', color='blue'))        
         image_data = SDAPI.pose_generation(image, prompt=f"{narration}, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon", seed=0, steps=40)
-        #TODO : remove background(model not available)
-        # image_data = SDAPI.remove_background(input_image=image_data)
         if image_data:
             return image_data
     
@@ -289,13 +236,6 @@ class Kahani:
                     print(f"File {file_path} not found.")
                     continue  # Skip this iteration if the file is not found
 
-                # dimensions.append(box["dimensions"])  # x, y, width, height
-                # dimensions.append([
-                #     int(box["dimensions"][0]),
-                #     int(box["dimensions"][1]),
-                #     int(box["dimensions"][2]),
-                #     int(box["dimensions"][3])
-                # ])
                 dimensions_str = box["dimensions"]
                 if isinstance(dimensions_str, str):
                     dimensions_list = ast.literal_eval(dimensions_str)
@@ -321,9 +261,6 @@ class Kahani:
                 canvas.paste(images[i], (dimensions[i][0], dimensions[i][1]), images[i])  
             final_image_path = self.local_dir(f"scene_{s}_bounding_box.png")
             canvas.save(final_image_path, "PNG")
-            # image = canvas           
-            # with open(self.local_dir(f"scene_{s}_bounding_box.png"), "wb") as f:
-            #     f.write(base64.b64decode(image))
             yield "file", True, final_image_path, narration
                
     def generate_bounding_box(self):
@@ -333,9 +270,6 @@ class Kahani:
             narration = self.db.scenes[s].narration
             characters = self.db.scenes[s].characters
             print("inside bounding box generation function")
-            # print("backdrop", backdrop)
-            # print("narration", narration)
-            # print("characters", characters)
             bounding_box = BoundingBoxPrompt(backdrop = backdrop,narration=narration,characters=characters, stream=True, callback=self.print_llm_output)
             bb_string = ""
             for chunk in bounding_box:
@@ -366,10 +300,6 @@ class Kahani:
                         else:
                             pose, facial_expression = action, "Neutral face expression"
                         original_prompt = c.prompt
-                        print("name", name)
-                        print("original_prompt", original_prompt)
-                        print("pose", pose)
-                        print("facial_expression", facial_expression)
                         prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
                         self.db.characters[i].scene_prompt[s] = prompt
                         image_data =self.generate_character_pose(c, c.image, narration=prompt)
