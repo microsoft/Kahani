@@ -7,17 +7,7 @@ class TestExtractCharacters(TestCase):
     
         def test_empty(self):
             out = ExtractCharactersPrompt(
-                story="""Once upon a wave-kissed time, in the snug coastal village near Kovalam Beach, there lived a cheerful girl named Sruthi. With twinkling eyes and a heart as warm as the sun that danced on the ocean waves, Sruthi was famous for two things: her love for the sweet, sticky halwa and her boundless kindness. 
-
-Sruthi's halwa was not just a treat; it was a ribbon of joy woven through the community. Made with love, sprinkled with cardamom, and filled with cashews, it melted in your mouth as magically as a golden sunset melt into the sea. 
-
-One sun-splashed day, as Sruthi strolled home with a batch of fresh halwa, she noticed her new neighbor—a shy, elderly man named Kumar uncle—watching the playful seagulls from his lonely porch. Sruthi's heart whispered like the gentle waves, "Atithi Devo Bhava." 
-
-With a knock as soft as the sea breeze, Sruthi stood at Kumar uncle's door, offering a plate piled high with halwa. His eyes twinkled, much like hers, as an unexpected smile found its way to his lips. "Oh, what delightful halwa! Thank you, my dear," he said, tasting not just the sweetness of the halwa but the sweetness of companionship. 
-
-From then on, Kumar uncle wasn't just a neighbor; he was part of Sruthi's extended family. They would share stories of the sea, bask in the balmy breeze, and of course, relish halwa together. Sruthi's kind gesture rippled through the village, reminding everyone that a little sweetness goes a long way—not just the kind you eat, but the kind you live. 
-
-And so, embraced by the coconut palms and sung to by the waves, Sruthi and her neighbors wove a tapestry of kindness that was as delightful and enduring as Kovalam's very own sandy shores. """,
+                story="""Once upon a time, in the warm and sunny land of Kerala, there lived a little girl named Sruthi. She had a smile like the morning sun and a laugh that reminded everyone of the gentle waves at the nearby Kovalam beach. Sruthi loved many things, but if you asked her to pick her favorite, she would giggle and say, "Halwa, of course!" She adored the sweet, sticky treat that her Amma made, flavored with cardamom and ghee. One bright day, Sruthi saw a moving van parked next to her house. "Amma, we have new neighbors!" she exclaimed with excitement. "Yes, dear. That's Kumar uncle's family. They're moving in today," her Amma replied with a warm smile. Sruthi wanted to welcome them. She knew how good it felt to make friends and the importance of being kind to neighbors. So, with a little help from her Amma, Sruthi made the softest, most delicious halwa and decorated it with cashew nuts that looked like little stars. With a plate full of halwa, Sruthi shyly knocked on Kumar uncle's door. "Namaste, I'm Sruthi. Welcome to our neighborhood!" she said, offering the halwa. Kumar uncle's eyes twinkled like the evening stars over Kovalam. "Thank you, little one. Your kindness is as sweet as this delightful halwa," he said, taking a small bite. "And from today, you have a new friend right next door. From that day forward, Sruthi and Kumar uncle became good friends. He would tell her stories of the ocean, and she would share more halwa, made with love and kindness. And the neighbors all around learned the gentle power of kindness and the joy of welcoming friends with open hearts and sweet treats.""",
                 debug=True,
                 stream=True
             )

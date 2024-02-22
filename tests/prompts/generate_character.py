@@ -7,7 +7,7 @@ class TestExtractCharacters(TestCase):
     
         def test_empty(self):
             out = GenerateCharactersPrompt(
-                description = "A reserved elderly man in his early 70s, residing near Kovalam Beach. He has a gentle face framed by thinning white hair and weathered skin that tells the story of many years spent under the coastal sun. Often seen wearing a comfortable, light-colored mundu paired with a long-sleeved, button-up shirt, his attire is suitable for the warm, seaside climate and modest lifestyle.",
+                description = "A new neighbor in his early 50s settled in Kerala, with a dark complexion and short salt-and-pepper hair. He is typically dressed in a crisp, white shirt that is neatly tucked into a traditional cream-colored veshti with a golden border",
                 debug=True,
                 stream=True
             )

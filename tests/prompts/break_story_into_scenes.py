@@ -9,43 +9,24 @@ class TestBreakStoryIntoScenes(TestCase):
     
         def test_empty(self):
             out = BreakStoryIntoScenesPrompt(
-                story="""Once upon a time, in a lush jungle kingdom, there lived a mighty ruler named King Moocha Raja. His palace was grand, and his heart, kind. One sunny afternoon, a clever little monkey spied an open window to the king's chamber and thought it the perfect chance for an adventure.
-
-Sneaking inside, the monkey discovered King Moocha Raja fast asleep, snoring louder than a thunderstorm! Quietly, the monkey picked up a large palm leaf and began to fan the sleeping king. The cool breeze was so pleasant that the king slept more peacefully than ever before.
-
-When he awoke, King Moocha Raja was surprised to see his new furry friend. He chuckled with delight and named the monkey Munchkin. The king and Munchkin quickly became the best of pals. Every day the monkey entertained the king with acrobatic tricks and was rewarded with juicy fruits and tiny royal clothes.
-
-But not everyone was pleased. The king’s ministers scowled at the monkey, not liking the special attention he received.
-
-One ill-fated morning, as Munchkin and the king were playing in the royal chambers, a mischievous fly buzzed around the king's nose. Trying to help, Munchkin aimed to swat the fly away but accidentally thumped the king’s nose instead!
-
-"Ouch!" howled the king, his nose red with surprise and anger. "Away with you!" he commanded, feeling betrayed.
-
-Munchkin's heart sank, and with a sad little squeak, he scampered away.
-
-Time passed, and King Moocha Raja's nose healed, but his heart ached for his dear friend. He realized his rash decision was too harsh. The king ordered a search for Munchkin, but the monkey was nowhere to be found.
-
-Finally, the king went to the open window and called out, “Munchkin, my friend, if you are near, know that I am sorry!”
-
-To his joy, Munchkin emerged from a nearby tree. The king welcomed him back with a warm hug, promising always to be a fair and kind friend.
-
-And so, King Moocha Raja and Munchkin were reunited, sharing many more days of laughter and friendship in the grand kingdom, where every window stayed open, just in case.
+                story="""Once upon a time, in the warm and sunny land of Kerala, there lived a little girl named Sruthi. She had a smile like the morning sun and a laugh that reminded everyone of the gentle waves at the nearby Kovalam beach.
+Sruthi loved many things, but if you asked her to pick her favorite, she would giggle and say, "Halwa, of course!" She adored the sweet, sticky treat that her Amma made, flavored with cardamom and ghee.
+One bright day, Sruthi saw a moving van parked next to her house. "Amma, we have new neighbors!" she exclaimed with excitement.
+"Yes, dear. That's Kumar uncle's family. They're moving in today," her Amma replied with a warm smile.
+Sruthi wanted to welcome them. She knew how good it felt to make friends and the importance of being kind to neighbors. So, with a little help from her Amma, Sruthi made the softest, most delicious halwa and decorated it with cashew nuts that looked like little stars.
+With a plate full of halwa, Sruthi shyly knocked on Kumar uncle's door. "Namaste, I'm Sruthi. Welcome to our neighborhood!" she said, offering the halwa.
+Kumar uncle's eyes twinkled like the evening stars over Kovalam. "Thank you, little one. Your kindness is as sweet as this delightful halwa," he said, taking a small bite. "And from today, you have a new friend right next door."
 """,
-                characters="""[{
-"name": "Moocha Raja",
-"description": "(full body:1.2), Indian king in rich, elaborate royal attire and jewelry, (standing:1.2) in his opulent, ornately decorated palace bedroom, thoughtful expression, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
-}, {
-"name": "The Monkey",
-"description": "(full body:1.2), Playful monkey in a miniature coat and pants, (standing:1.2) in the royal court next to Moocha Raja, mischievous yet affectionate expression, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
-}, {
-"name": "The Maid",
-"description": "(full body:1.2), Young maid in traditional Indian servant attire, (standing:1.2) in Moocha Raja's bedroom, fanning the king, look of dedication, (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
-}]""",
-                
-
-                debug=True
+                characters="""[{"name":"Sruthi","description":"A joyful girl from Kovalam beach, Kerala, about 9 years old with dark brown skin and shoulder-length curly black hair, usually tied in a ponytail with a green ribbon. She often wears a bright yellow sundress with little blue wave patterns, reflecting the beach beside her village."}, 
+{"name":"Sruthi's Amma","description":"A woman from Kovalam beach, Kerala, in her mid-30s with long straight black hair typically pulled back into a neat bun. She has a warm brown skin tone and frequently wears a light green cotton sari with a violet border and a matching blouse, her attire echoing the lushness of her garden."}, 
+{"name":"Kumar Kaka","description":"A cheerful man from Kovalam beach, Kerala, in his early 50s with light brown skin and a head of thick, slightly graying hair. He sports a friendly mustache and prefers wearing a cream-colored shirt paired with a sky-blue lungi, embodying the casual warmth of seaside living."}]
+""",
+                debug=True,
+                stream=True
             )
-            print(out)
+            # print(out)
+            for chunk in out:
+                print(chunk, end="")
 
 
 # output for above input
