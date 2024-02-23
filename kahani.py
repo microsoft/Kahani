@@ -237,7 +237,6 @@ class Kahani:
                     if image.mode != 'RGBA':
                         image = image.convert('RGBA')
                     images.append(image)
-                        # images.append(Image.open(file_path))
                 except FileNotFoundError:
                     print(f"File {file_path} not found.")
                     continue  # Skip this iteration if the file is not found
@@ -288,7 +287,7 @@ class Kahani:
             except Exception as e:
                 print(colored(f"error extracting bounding box: {e}", color='red'))
                     
-    def generate_scene(self):
+    def generate_scenes(self):
         for s, scene in enumerate(self.db.scenes):
             print(colored('\n\ngenerating scene', color='blue'))
             name = f"scene-{s}"
@@ -307,6 +306,7 @@ class Kahani:
                             pose, facial_expression = action, "Neutral face expression"
                         original_prompt = c.prompt
                         prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
+                        yield "text", False, prompt
                         self.db.characters[i].scene_prompt[s] = prompt
                         image_data =self.generate_character_pose(c, c.image, narration=prompt)
                         image_data = SDAPI.remove_background(image=image_data)
@@ -340,7 +340,7 @@ class Kahani:
             full_final_prompt = ""
             for chunk in final_prompt:
                 full_final_prompt += chunk
-            print("final_prompt", full_final_prompt)
+            yield "text", False, full_final_prompt
             image_path = self.local_dir(f"scene_{s}_bounding_box.png")
             with open(image_path, "rb") as f:
                 conditioned_image = f.read()
@@ -354,8 +354,6 @@ class Kahani:
                 second_ref_img = character_reference_images[1]
             if(len(character_reference_images) == 1):
                 second_ref_img = first_ref_img
-            print("calling API here")
-            print("final prompt input", full_final_prompt)
             image_data = SDAPI.reference_image(conditioned_image=reference_canny_img,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=full_final_prompt, seed=0, steps=40)
             self.db.scenes[s].image = image_data
             with open(self.local_dir(f"final_scene{s}.png"), "wb") as f:
