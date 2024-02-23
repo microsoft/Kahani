@@ -32,23 +32,21 @@ def bot(history):
     print("user_input", user_input)
     k = Kahani(local_dir())
     k.input = user_input
-
-    steps = ["extract_culture", "write_story", "extract_characters_from_story", "generate_character_image",
-             "break_story_into_scenes", "generate_scene", "generate_bounding_box", "generate_bb_image", "final_scene_generation"]
+    steps = ["extract_culture", "summarize_culture", "write_story", "extract_characters_from_story", "generate_character_image", "break_story_into_scenes"]
     for step in steps:
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
-            if out[1]:
-                history.append([None, ""])
             if out[0] == "text":
                 chunk = out[2]
                 history[-1][1] += chunk
                 yield history
             elif out[0] == "file":
+                yield history
                 path = out[2]
                 alt_text = out[3]
-                history[-1][1] = (path, alt_text)
+                history.append([None, (path, alt_text)])
                 yield history
+                history.append([None, ""])
         history.append([None, None])
 
 

@@ -62,13 +62,20 @@ class Kahani:
         for chunk in cultural_context:
             full_cultural_context += chunk
             yield "text", False, chunk
-
-        # print(colored('\nsummarizing cultural context\n', color='blue'))
-
-        # cultural_context = SummariseCulturePrompt(
-        #     cultural_context=cultural_context,
-        #     stream=True, callback=self.print_llm_output)
         self.db.cultural_context = full_cultural_context
+        print(colored(f"\n\nCultural Context: {self.db.cultural_context}", color='blue'))
+    
+    def summarize_culture(self):
+        print(colored('\nsummarizing cultural context\n', color='blue'))
+
+        cultural_context = SummariseCulturePrompt(
+            cultural_context=self.db.cultural_context,
+            stream=True, callback=self.print_llm_output)
+        culture_summary = ""
+        for chunk in cultural_context:
+            culture_summary += chunk
+            yield "text", False, chunk
+        self.db.cultural_context = culture_summary
         print(colored(f"\n\nCultural Context: {self.db.cultural_context}", color='blue'))
         
     def classify_change(self):
@@ -152,10 +159,8 @@ class Kahani:
             character_prompt = ""
             for chunk in prompt:
                 character_prompt += chunk
+                yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
-
-            print(colored(f"character: {self.db.characters[index]}", color='blue'))
-
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
             image = SDAPI.remove_background(image=image)
             if image:
@@ -163,6 +168,7 @@ class Kahani:
                 with open(self.local_dir(f"character_gen_{index}.png"), "wb") as f:
                     f.write(base64.b64decode(image))
                 yield "file", True, self.local_dir(f"character_gen_{index}.png"), character_prompt
+            print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
     def extract_characters_from_story(self):
         print(colored('\n\nextracting characters', color='blue'))
@@ -173,12 +179,12 @@ class Kahani:
         for chunk in characters_generator:
             character_string += chunk
             yield "text", False, chunk
-        
         try:
             characters = json.loads(character_string)
             self.db.characters = [Character(**c) for c in characters]
         except Exception as e:
             print(colored(f"error extracting characters: {e}", color='red'))
+        print(colored(f"characters extracted from story: {self.db.characters}", color='blue'))
     
     def break_story_into_scenes(self):
         print(colored('\n\nbreaking story into scenes', color='blue'))
