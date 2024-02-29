@@ -13,3 +13,11 @@ Here are some possible approaches:
 
 Additional UX improvements:
 - [ ] Beautify the formatting of the story
+
+## Developer Notes:
+
+```
+$ docker build . -t kahani-streaming
+$ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
+
+```
