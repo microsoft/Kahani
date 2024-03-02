@@ -7,6 +7,7 @@ from .summarise_culture import SummariseCulturePrompt
 from .generate_scenes import GenerateScenesPrompt
 from .generate_character import GenerateCharactersPrompt
 from .bounding_box import BoundingBoxPrompt
+from .generate_pose import GeneratePosePrompt
 
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "GenerateScenesPrompt",
     "GenerateCharactersPrompt",
     "BoundingBoxPrompt",
+    "GeneratePosePrompt",
 ]
