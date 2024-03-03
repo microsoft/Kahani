@@ -77,7 +77,36 @@ class TestGeneratePoseImage(TestCase):
             # print(out)
             img_data = base64.b64decode(out)
             with open(f"api_bala.png", "wb") as f:
-                f.write(img_data)          
+                f.write(img_data)     
+    
+    # Add more tests for testing image generation after restricting prompt tokens
+    def test_bala(self):
+        prompt = "(full body:1.5), boy from Chennai, 9, sun-kissed brown skin in bright yellow T-shirt, navy blue shorts with white stripes, short, curly dark brown hair, (walking tiredly but happy:1.5) on Marina Beach, (holding a shell, lively brown eyes glistening with joy:1.5), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        file_name = "tests/prompts/Generate_pose/bala_ref_img.png"
+        with open(file_name, "rb") as f:
+            img_data = f.read()
+            img_data = base64.b64encode(img_data).decode("utf-8")
+            out = SDAPI.pose_generation(reference_image=img_data, prompt=prompt, seed=0, steps=40)
+            out = SDAPI.remove_background(image=out)
+
+            # print(out)
+            img_data = base64.b64decode(out)
+            with open(f"bala_token.png", "wb") as f:
+                f.write(img_data)
+                
+    def test_simba(self):
+        prompt = "(full body:1.5), Fluffy Golden Dog at Countryside, golden coat, perky ears, chocolate brown eyes, (laying down posture:1.5) on the green grass under sunlight, (content and tired expression with a yawn:1.5), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        file_name = "tests/prompts/Generate_pose/simba_ref_img.png"
+        with open(file_name, "rb") as f:
+            img_data = f.read()
+            img_data = base64.b64encode(img_data).decode("utf-8")
+            out = SDAPI.pose_generation(reference_image=img_data, prompt=prompt, seed=0, steps=40)
+            out = SDAPI.remove_background(image=out)
+
+            # print(out)
+            img_data = base64.b64decode(out)
+            with open(f"simba_token.png", "wb") as f:
+                f.write(img_data)  
         
 
        

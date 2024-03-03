@@ -44,10 +44,26 @@ class TestGeneratePose(TestCase):
                 prompt += chunk
             print(prompt)
             
+        
+        # in this example, we have changed character action to remove dependency on anotger character     
         def test_third(self):
             out = GeneratePosePrompt(
                 description = "A fluffy dog with a golden coat that shimmers in the sunlight. Simba's ears are perky, and his round eyes a rich, chocolate brown which radiate joy and excitement.",
-                action = "walking closely beside Bala, looks content and a bit tired, occasionally yawning",
+                action = "looks content and a bit tired, occasionally yawning",
+                debug=True,
+                stream=True
+            )
+            prompt = ""
+            for chunk in out:
+                prompt += chunk
+            print(prompt)
+            
+        # test for character actions
+        # in this example, we have changed character action to remove dependency on anotger character
+        def test_fourth(self):
+            out = GeneratePosePrompt(
+                description = "A young boy from Chennai, aged 9, with sun-kissed brown skin and a head of short, curly dark brown hair. Bala's eyes are a lively shade of brown, reflecting his energetic spirit. He usually wears a bright yellow T-shirt and navy blue shorts with white stripes on the sides, perfect for the warm beach weather and active days spent running around Marina Beach.",
+                action = "walking tiredly but happy, holding a shell in one hand",
                 debug=True,
                 stream=True
             )
