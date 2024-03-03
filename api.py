@@ -321,7 +321,7 @@ class SDAPI:
         if "steps" not in kwargs:
             kwargs["steps"] = 40
  
-        # kwargs['sd_model_hash'] = "31e35c80fc"
+        kwargs['sd_model_hash'] = "31e35c80fc"
         kwargs['sd_model_name'] = "sd_xl_base_1.0"
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
@@ -329,13 +329,14 @@ class SDAPI:
  
         # kwargs['sd_vae_hash'] = None
         # kwargs['sd_vae_name'] = "sdxl_vae"
-        kwargs['refiner_checkpoint'] = "sd_xl_refiner_1.0.safetensors"
-        kwargs['refiner_switch_at'] = 0.8
+        # kwargs['refiner_checkpoint'] = "sd_xl_refiner_1.0.safetensors"
+        # kwargs['refiner_switch_at'] = 0.8
         kwargs['alwayson_scripts'] = {}
         kwargs['alwayson_scripts']['controlnet'] = {}
         kwargs['alwayson_scripts']['controlnet']['args'] = [
             {
                 "enabled": True,
+                "module": "reference_only",
                 "weight": 1.0,
                 "preprocessor": "reference_only",
                 "image": reference_image,
