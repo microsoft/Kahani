@@ -287,7 +287,7 @@ class Kahani:
             except Exception as e:
                 print(colored(f"error extracting bounding box: {e}", color='red'))
                     
-    def generate_scenes(self):
+    def generate_pose(self):
         for s, scene in enumerate(self.db.scenes):
             print(colored('\n\ngenerating scene', color='blue'))
             name = f"scene-{s}"
@@ -297,23 +297,18 @@ class Kahani:
                     if c.name == name:
                         character_actions.append(
                             f"{name} ({c.description}): {action}")
-                        parts = action.split(", ")
-                        # Storing into two variables
-                        if len(parts) >= 2:
-                            pose = parts[0]
-                            facial_expression = ", ".join(parts[1:])
-                        else:
-                            pose, facial_expression = action, "Neutral face expression"
-                        original_prompt = c.prompt
-                        prompt = modify_scene_pose_generation_prompt(original_prompt=original_prompt,pose=pose,facial_expression=facial_expression)
-                        yield "text", False, prompt
-                        self.db.characters[i].scene_prompt[s] = prompt
-                        image_data =self.generate_character_pose(c, c.image, narration=prompt)
+                        prompt = GeneratePosePrompt(description=c.description, action=action, stream=True, callback=self.print_llm_output)
+                        character_pose_prompt = ""
+                        for chunk in prompt:
+                            character_pose_prompt += chunk
+                            yield "text", False, chunk
+                        self.db.characters[i].scene_prompt[s] = character_pose_prompt
+                        image_data =SDAPI.pose_generation(reference_image=c.image, prompt=character_pose_prompt, seed=0, steps=40)
                         image_data = SDAPI.remove_background(image=image_data)
                         self.db.characters[i].image_pose[s] = image_data
                         with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
                             f.write(base64.b64decode(image_data))
-                        yield "file", True, self.local_dir(f"scene{s}_{name}.png"), prompt
+                        yield "file", True, self.local_dir(f"scene{s}_{name}.png"), character_pose_prompt
     
     def final_scene_generation(self):
         for s, scene in enumerate(self.db.scenes):
