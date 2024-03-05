@@ -18,6 +18,10 @@ Additional UX improvements:
 
 ```
 $ docker build . -t kahani-streaming
+$ touch .env
+$ vi .env
+# SDAPI_HOST=http://172.17.0.1:7860
+# OPENAI_API_KEY=<OPENAI_API_KEY>
 $ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
 
 ```
