@@ -241,8 +241,8 @@ class SDAPI:
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
 
 
-        # kwargs['sd_vae_hash'] = None
-        # kwargs['sd_vae_name'] = "sdxl_vae"
+        kwargs['sd_vae_hash'] = "63aeecb90f"
+        kwargs['sd_vae_name'] = "sdxl_vae.safetensors"
         # kwargs['refiner_checkpoint'] = "7440042bbd"
         # kwargs['refiner_switch_at'] = 0.8
         kwargs['alwayson_scripts'] = {}
