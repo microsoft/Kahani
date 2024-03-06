@@ -241,8 +241,8 @@ class SDAPI:
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
 
 
-        kwargs['sd_vae_hash'] = "63aeecb90f"
-        kwargs['sd_vae_name'] = "sdxl_vae.safetensors"
+        # kwargs['sd_vae_hash'] = "63aeecb90f"
+        # kwargs['sd_vae_name'] = "sdxl_vae.safetensors"
         # kwargs['refiner_checkpoint'] = "7440042bbd"
         # kwargs['refiner_switch_at'] = 0.8
         kwargs['alwayson_scripts'] = {}
@@ -262,11 +262,12 @@ class SDAPI:
                 "control_mode": "Balanced",
                 "pixel_perfect": True,
                 "save_detected_map": True,
+                "hr_option": "Both",
             },
             {
                 "enabled": True,
                 "module": "reference_only",
-                "model": "none",
+                "model": "None",
                 "weight": 1,
                 "image": first_ref_image,
                 "resize_mode": "Just Resize",
@@ -277,11 +278,12 @@ class SDAPI:
                 "control_mode": "Balanced",
                 "pixel_perfect": True,
                 "save_detected_map": True,
+                "hr_option": "Both",
             },
             {
                 "enabled": True,
                 "module": "reference_only",
-                "model": "none",
+                "model": "None",
                 "weight": 1,
                 "image": second_ref_image,
                 "resize_mode": "Just Resize",
@@ -292,6 +294,7 @@ class SDAPI:
                 "control_mode": "Balanced",
                 "pixel_perfect": True,
                 "save_detected_map": True,
+                "hr_option": "Both",
             }
         ]
 

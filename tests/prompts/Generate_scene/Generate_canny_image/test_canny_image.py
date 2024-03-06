@@ -13,10 +13,10 @@ class TestCannyImage(TestCase):
             img_data = f.read()
             img_data = base64.b64encode(img_data).decode("utf-8")
             out = SDAPI.controlnet(init_images=[img_data])
-            print(out)
-            # img_data = base64.b64decode(out)
-            # with open(f"tests/prompts/Generate_scene/Generate_canny_image/canny_bb_scene0.png", "wb") as f:
-            #     f.write(img_data)
+            # print(out)
+            img_data = base64.b64decode(out)
+            with open(f"tests/prompts/Generate_scene/Generate_canny_image/canny_bb_scene0.png", "wb") as f:
+                f.write(img_data)
                 
     # def test_canny_scene_1(self):
     #     file_name = "tests/prompts/Generate_scene/Generate_canny_image/scene1_bounding_box.png"
