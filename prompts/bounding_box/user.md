@@ -4,8 +4,6 @@ Scene backdrop:
 Narration of Scene:
 {narration}
 
-character details
+character details:
 {characters}
 
-character image
-{images}
