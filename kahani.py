@@ -347,6 +347,8 @@ class Kahani:
                 first_ref_img = character_reference_images[0]
             if(len(character_reference_images) > 1):  
                 second_ref_img = character_reference_images[1]
+                
+            # this condition is considered when there is only one character
             if(len(character_reference_images) == 1):
                 second_ref_img = first_ref_img
             image_data = SDAPI.reference_image(conditioned_image=reference_canny_img,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=full_final_prompt, seed=0, steps=40)
@@ -363,7 +365,12 @@ class Kahani:
         self.db.scenes[index].image = image
         self.save_db()
         print(f"-------- scene {index} synced ----------")
-
+        
+    def update_inpainted_image(self):
+        print(colored('\n\nupdating inpainted image', color='blue'))
+        
+        yield "file", True, self.local_dir(f"final_scene0.png"),"final scene 0"
+        yield "file", True, self.local_dir(f"final_scene1.png"),"final scene 1"
     
     
     
