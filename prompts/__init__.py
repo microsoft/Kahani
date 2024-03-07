@@ -8,6 +8,7 @@ from .generate_scenes import GenerateScenesPrompt
 from .generate_character import GenerateCharactersPrompt
 from .bounding_box import BoundingBoxPrompt
 from .generate_pose import GeneratePosePrompt
+from .user_input import UserInputPrompt
 
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "GenerateCharactersPrompt",
     "BoundingBoxPrompt",
     "GeneratePosePrompt",
+    "UserInputPrompt",
 ]
