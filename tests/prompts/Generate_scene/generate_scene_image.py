@@ -55,5 +55,28 @@ class TestGenerateSceneImage(TestCase):
         with open(f"final_scene0_image.png", "wb") as f:
             f.write(img_data)
             
+            
+    def test_final_scene_generation(self):
+        prompt = "Bala and Simba, (boy in bright yellow T-shirt, navy blue shorts, (walking energetically:1.2), (bright smile:1.2)), (Golden Retriever with cream-colored coat, (playfully tugging on leash:1.2), (curious expression, wide eyes:1.2)), (Marina Beach with ocean backdrop, colorful umbrellas, vendor-filled golden sandy beach, families in the sun), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        
+        
+        with open("tests/prompts/Generate_scene/inputs/canny_bb_test.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_Bala.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_Simba.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")
+       
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+ 
+        img_data = base64.b64decode(image_data)
+        with open(f"tests/prompts/Generate_scene/outputs/final_scene_image_test.png", "wb") as f:
+            f.write(img_data)
+            
            
             
