@@ -46,3 +46,30 @@ class TestBoundingBox(TestCase):
         for chunk in out:
             bounding_box_dimensions += chunk
         print(bounding_box_dimensions) 
+        
+
+    # testing test cases for object detection
+    def test_OD_scenario_1(self):
+        out = BoundingBoxPrompt(
+            
+            narration= "Bala, with his shiny dark hair, and Simba, the golden-furred dog, sprint along Marina Beach. The sand tickles their feet and paws.",
+            backdrop= "The wide expanse of Marina Beach is alive with bright skies and kite-flyers. The Chennai skyline looms in the distance, while vendors and families dot the shore.",
+            characters=""" {
+"Bala": "running joyfully, wide smile",
+"Simba": "bounding after waves, tail high and wagging, looks playful"
+}""",
+
+            stream=True,
+            debug=True,
+        )
+        bounding_box_dimensions = ""
+        for chunk in out:
+            bounding_box_dimensions += chunk
+        print(bounding_box_dimensions)
+        
+        
+    # reponse is
+#     [
+# {"character":"Bala","dimensions":[320, 360, 640, 600]},
+# {"character":"Simba","dimensions":[480, 360, 400, 600]}
+# ]

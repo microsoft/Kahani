@@ -15,7 +15,7 @@ class TestGenerateScene(TestCase):
             narration="Bala, with his shiny dark hair, and Simba, the golden-furred dog, sprint along Marina Beach. The sand tickles their feet and paws.",
             backdrop="The wide expanse of Marina Beach is alive with bright skies and kite-flyers. The Chennai skyline looms in the distance, while vendors and families dot the shore.",
             characters="""{
-"Bala": "running joyfully, wide smile, eyes focused on Simba",
+"Bala": "running joyfully, wide smile",
 "Simba": "bounding after waves, tail high and wagging, looks playful"
 }
 """,

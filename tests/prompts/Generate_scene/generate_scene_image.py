@@ -60,7 +60,7 @@ class TestGenerateSceneImage(TestCase):
         prompt = "Bala and Simba, (boy in bright yellow T-shirt, navy blue shorts, (walking energetically:1.2), (bright smile:1.2)), (Golden Retriever with cream-colored coat, (playfully tugging on leash:1.2), (curious expression, wide eyes:1.2)), (Marina Beach with ocean backdrop, colorful umbrellas, vendor-filled golden sandy beach, families in the sun), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
         
         
-        with open("tests/prompts/Generate_scene/inputs/canny_bb_test.png", "rb") as f:
+        with open("tests/prompts/Generate_scene/inputs/scene3_bounding_box.png", "rb") as f:
             conditioned_image = f.read()
             conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
        
@@ -75,8 +75,29 @@ class TestGenerateSceneImage(TestCase):
         image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
  
         img_data = base64.b64decode(image_data)
-        with open(f"tests/prompts/Generate_scene/outputs/final_scene_image_test.png", "wb") as f:
+        with open(f"tests/prompts/Generate_scene/outputs/final_scene_manual.png", "wb") as f:
             f.write(img_data)
             
-           
+    def test_object_detection(self):
+        prompt = "Bala and Simba, (young boy in a vibrant, traditional Tamil lungi, knotted at the waist and paired with a plain white shirt (running joyfully, wide smile:1.2)), (golden-furred dog (bounding after waves, tail high and wagging, looks playful:1.2)), (Marina Beach bustling with kite-flyers, bright skies, distant Chennai skyline, vendors and families along the shore), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        
+        with open("tests/prompts/Generate_scene/inputs/object_detection_bb.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+       
+        with open("tests/prompts/Bounding_box/object_detection/inputs/Bala_bb.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
+       
+        with open("tests/prompts/Bounding_box/object_detection/inputs/Simba_bb.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")
+       
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+ 
+        img_data = base64.b64decode(image_data)
+        with open(f"tests/prompts/Generate_scene/outputs/object_detection_final_scene.png", "wb") as f:
+            f.write(img_data)
+        
+        
             
