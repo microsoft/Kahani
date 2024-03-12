@@ -35,17 +35,17 @@ steps:
       Dockerfile: '**/Dockerfile'
     displayName: "Build Server Image"
 
-  # - task: Bash@3
-  #   inputs:
-  #     targetType: 'inline'
-  #     script: |
-  #       SERVEREXPRESSION="s/SERVERVERSION/$(Build.BuildId)/"
-  #       echo $SERVEREXPRESSION
-  #       sed -i $SERVEREXPRESSION $(System.DefaultWorkingDirectory)/terraform/webapp.tf
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        SERVEREXPRESSION="s/SERVERVERSION/$(Build.BuildId)/"
+        echo $SERVEREXPRESSION
+        sed -i $SERVEREXPRESSION $(System.DefaultWorkingDirectory)/terraform/webapp.tf
         
-  #       git diff $(System.DefaultWorkingDirectory)/terraform/webapp.tf
-  #   # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
-  #   displayName: "Update Server Config"
+        git diff $(System.DefaultWorkingDirectory)/terraform/webapp.tf
+    # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+    displayName: "Update Server Config"
         
   - task: TerraformInstaller@1
     inputs:
@@ -57,7 +57,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'init'
-      backendServiceArm: 'Kahani2-Dev-Ops-Connection'
+      backendServiceArm: 'Kahani-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       backendAzureRmResourceGroupName: 'kahani-tfstate'
       backendAzureRmStorageAccountName: 'kahnitfstate'
@@ -70,7 +70,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      environmentServiceNameAzureRM: 'Kahani2-Dev-Ops-Connection'
+      environmentServiceNameAzureRM: 'Kahani-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       commandOptions: '-var="prefix=$(prefix)" -var="OPENAI_API_KEY=$(OPENAI_API_KEY)" -var="SDAPI_HOST=$(SDAPI_HOST)"  -var="container_registry=$(container_registry)" -var="container_registry_username=$(container_registry_username)" -var="container_registry_password=$(container_registry_password)"'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))

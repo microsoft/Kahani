@@ -24,7 +24,7 @@ resource "azurerm_linux_web_app" "main" {
     always_on = true
 
     application_stack {
-      docker_image_name        = "kahani-streaming:1111"
+      docker_image_name        = "kahani-streaming:SERVERVERSION"
       docker_registry_url      = var.container_registry
       docker_registry_username = var.container_registry_username
       docker_registry_password = var.container_registry_password
