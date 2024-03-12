@@ -1,0 +1,75 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  Agent.Source.Git.ShallowFetchDepth: 2
+
+steps:    
+  # Path filter for function code changes
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $modifiedFiles = git diff --name-only HEAD HEAD~1
+        $modifiedFolders = $modifiedFiles | Split-Path -Parent | Select-Object -Unique
+        Write-Host "Modified folders:"
+        $modifiedFolders | ForEach-Object { Write-Host $_ }
+        Write-Host "##vso[task.setvariable variable=modifiedFolders]$modifiedFolders"
+    # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    displayName: "Fetching the list of changes"
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'NewPwRRegistry'
+      repository: 'kahani-streaming'
+      command: 'buildAndPush'
+      buildContext: '$(System.DefaultWorkingDirectory)'
+      Dockerfile: '**/Dockerfile'
+    displayName: "Build Server Image"
+
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        SERVEREXPRESSION="s/SERVERVERSION/$(Build.BuildId)/"
+        echo $SERVEREXPRESSION
+        sed -i $SERVEREXPRESSION $(System.DefaultWorkingDirectory)/terraform/webapp.tf
+        
+        git diff $(System.DefaultWorkingDirectory)/terraform/container.tf
+    # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+    displayName: "Update Server Config"
+        
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+    # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
+      backendServiceArm: 'PbyC-Dev-Ops-Connection'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
+      backendAzureRmResourceGroupName: 'kahani-tfstate'
+      backendAzureRmStorageAccountName: 'kahnitfstate'
+      backendAzureRmContainerName: 'tfstate'
+      backendAzureRmKey: 'study.tfstate'
+    # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      environmentServiceNameAzureRM: 'PbyC-Dev-Ops-Connection'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
+      commandOptions: '-var="prefix=$(prefix)" -var="OPENAI_API_KEY=$(OPENAI_API_KEY)" -var="SDAPI_HOST=$(SDAPI_HOST)"  -var="container_registry=$(container_registry)" -var="container_registry_username=$(container_registry_username)" -var="container_registry_password=$(container_registry_password)"'
+    # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+  

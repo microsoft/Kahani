@@ -177,83 +177,93 @@ def inpainting(imgeditor, user_input, scene_number, ref_image):
 
 
 with gr.Blocks() as demo:
-    gr.Markdown("# Kahani: Under the Hood")
-    chatbot = gr.Chatbot(
-        [],
-        elem_id="chatbot",
-        bubble_full_width=False,
-        avatar_images=(
-            None, (os.path.join(os.path.dirname(__file__), "avatar.png"))),
-        likeable=False,
-        height=600
-    )
 
-    with gr.Row():
-        txt = gr.Textbox(
-            scale=4,
-            show_label=False,
-            placeholder="Enter text and press enter",
-            container=False,
+    with gr.Column() as user_study:
+        gr.Markdown("## User Study")
+        pc = gr.Textbox(placeholder="Participation code", show_label=False, container=False)
+        pc_submit = gr.Button("Submit", variant="primary")
+
+    with gr.Column() as main_interface:
+        gr.Markdown("# Kahani: Under the Hood")
+        chatbot = gr.Chatbot(
+            [],
+            elem_id="chatbot",
+            bubble_full_width=False,
+            avatar_images=(
+                None, (os.path.join(os.path.dirname(__file__), "avatar.png"))),
+            likeable=False,
+            height=600
         )
 
-    with gr.Row():
-        gr.Examples(
-            [
-                "Write a story about Geetha who loves jamuns and lives in BR Hills",
-                "Write a story about Roopa lives at the foothills of Dehradun and loves to eat mangoes",
-                "Write a story about Bala and his pet dog Simba on Marina beach"
-            ],
-            txt
-        )
-
-    txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt], queue=False).then(
-        bot, chatbot, chatbot, api_name="bot_response"
-    )
-    txt_msg.then(lambda: gr.Textbox(interactive=True),
-                 None, [txt], queue=False)
-
-    with gr.Accordion("Advance Image Editing", open=False) as adv:
-        gr.Markdown("## Draw a mask to make a fine-grain change to the image.")
         with gr.Row():
-            gr.Markdown("### Select scene to fine-grain edits")
-            d = gr.Dropdown([f"Scene {i+1}" for i in range(2)])
-
-        imgeditor = gr.ImageEditor(
-            interactive=True,
-            crop_size="4:3",
-            brush=gr.Brush(
-                default_size="15",
-                color_mode="fixed",
-                default_color="#000",
+            txt = gr.Textbox(
+                scale=4,
+                show_label=False,
+                placeholder="Enter text and press enter",
+                container=False,
             )
-        )
 
         with gr.Row():
-            with gr.Column():
-                uadv = gr.Textbox(
-                    lines=2, placeholder="Enter your message here...", scale=10)
-                badv = gr.Button("Fine-grain edits", variant="primary")
-            with gr.Column():
-                op = gr.Image(label="Reference Image", type="pil")
+            gr.Examples(
+                [
+                    "Write a story about Geetha who loves jamuns and lives in BR Hills",
+                    "Write a story about Roopa lives at the foothills of Dehradun and loves to eat mangoes",
+                    "Write a story about Bala and his pet dog Simba on Marina beach"
+                ],
+                txt
+            )
 
-        def select_image(image_index):
-            print("Image changed")
-            image_index = int(image_index.split(" ")[1]) - 1
-            return {
-                "background": local_dir(f"final_scene{image_index}.png"),
-                "layers": [],
-                "composite": None
-            }
+        txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt], queue=False).then(
+            bot, chatbot, chatbot, api_name="bot_response"
+        )
+        txt_msg.then(lambda: gr.Textbox(interactive=True),
+                    None, [txt], queue=False)
 
-        d.change(fn=select_image, inputs=d, outputs=imgeditor)
-        badv.click(fn=inpainting,
-                   inputs=[imgeditor, uadv, d, op],
-                   )
+        with gr.Accordion("Advance Image Editing", open=False) as adv:
+            gr.Markdown("## Draw a mask to make a fine-grain change to the image.")
+            with gr.Row():
+                gr.Markdown("### Select scene to fine-grain edits")
+                d = gr.Dropdown([f"Scene {i+1}" for i in range(2)])
+
+            imgeditor = gr.ImageEditor(
+                interactive=True,
+                crop_size="4:3",
+                brush=gr.Brush(
+                    default_size="15",
+                    color_mode="fixed",
+                    default_color="#000",
+                )
+            )
+
+            with gr.Row():
+                with gr.Column():
+                    uadv = gr.Textbox(
+                        lines=2, placeholder="Enter your message here...", scale=10)
+                    badv = gr.Button("Fine-grain edits", variant="primary")
+                with gr.Column():
+                    op = gr.Image(label="Reference Image", type="pil")
+
+            def select_image(image_index):
+                print("Image changed")
+                image_index = int(image_index.split(" ")[1]) - 1
+                return {
+                    "background": local_dir(f"final_scene{image_index}.png"),
+                    "layers": [],
+                    "composite": None
+                }
+
+            d.change(fn=select_image, inputs=d, outputs=imgeditor)
+            badv.click(fn=inpainting,
+                    inputs=[imgeditor, uadv, d, op],
+                    )
+            
+        # main_interface.visible = False
 
 
 demo.queue()
 if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
-        server_port=8080
+        server_port=8080,
+        debug=True
     )
