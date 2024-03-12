@@ -259,11 +259,12 @@ with gr.Blocks() as demo:
             
         # main_interface.visible = False
 
+    gr.Markdown("[Privacy & Cookies](https://privacy.microsoft.com/privacystatement) | [Trademarks](https://www.microsoft.com/trademarks) | [Terms of Use](https://go.microsoft.com/fwlink/?LinkID=206977) | © 2024 Microsoft")
+
 
 demo.queue()
 if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",
-        server_port=8080,
-        debug=True
+        server_port=8080
     )
