@@ -51,25 +51,28 @@ steps:
     inputs:
       terraformVersion: 'latest'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+    displayName: "Install Terraform"
 
   - task: TerraformTaskV4@4
     inputs:
       provider: 'azurerm'
       command: 'init'
-      backendServiceArm: 'Kahani-Dev-Ops-Connection'
+      backendServiceArm: 'Kahani2-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       backendAzureRmResourceGroupName: 'kahani-tfstate'
       backendAzureRmStorageAccountName: 'kahnitfstate'
       backendAzureRmContainerName: 'tfstate'
       backendAzureRmKey: 'study.tfstate'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+    displayName: "Terraform Init"
 
   - task: TerraformTaskV4@4
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      environmentServiceNameAzureRM: 'Kahani-Dev-Ops-Connection'
+      environmentServiceNameAzureRM: 'Kahani2-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       commandOptions: '-var="prefix=$(prefix)" -var="OPENAI_API_KEY=$(OPENAI_API_KEY)" -var="SDAPI_HOST=$(SDAPI_HOST)"  -var="container_registry=$(container_registry)" -var="container_registry_username=$(container_registry_username)" -var="container_registry_password=$(container_registry_password)"'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
+    displayName: "Terraform Apply"
   
