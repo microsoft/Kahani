@@ -1,5 +1,4 @@
-
-FROM python:3.11-buster as builder
+FROM mcr.microsoft.com/mirror/docker/library/python:3.11-slim as builder
 
 RUN pip install poetry==1.7.1
 
