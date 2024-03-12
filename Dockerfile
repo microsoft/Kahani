@@ -13,7 +13,7 @@ RUN touch README.md
 
 RUN poetry install && rm -rf $POETRY_CACHE_DIR
 
-FROM python:3.11-slim-buster as runtime
+FROM mcr.microsoft.com/mirror/docker/library/python:3.11-slim as runtime
 
 ENV VIRTUAL_ENV=/app/.venv \
     PATH="/app/.venv/bin:$PATH"
