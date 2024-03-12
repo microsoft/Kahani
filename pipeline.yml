@@ -28,7 +28,7 @@ steps:
 
   - task: Docker@2
     inputs:
-      containerRegistry: 'NewPwRRegistry'
+      containerRegistry: 'KahaniDockerRegistry'
       repository: 'kahani-streaming'
       command: 'buildAndPush'
       buildContext: '$(System.DefaultWorkingDirectory)'
@@ -56,7 +56,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'init'
-      backendServiceArm: 'PbyC-Dev-Ops-Connection'
+      backendServiceArm: 'Kahani-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       backendAzureRmResourceGroupName: 'kahani-tfstate'
       backendAzureRmStorageAccountName: 'kahnitfstate'
@@ -68,7 +68,7 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'apply'
-      environmentServiceNameAzureRM: 'PbyC-Dev-Ops-Connection'
+      environmentServiceNameAzureRM: 'Kahani-Dev-Ops-Connection'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       commandOptions: '-var="prefix=$(prefix)" -var="OPENAI_API_KEY=$(OPENAI_API_KEY)" -var="SDAPI_HOST=$(SDAPI_HOST)"  -var="container_registry=$(container_registry)" -var="container_registry_username=$(container_registry_username)" -var="container_registry_password=$(container_registry_password)"'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
