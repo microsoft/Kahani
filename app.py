@@ -76,22 +76,13 @@ k = Kahani(local_dir())
 def bot(history):
     global show_accordion
     user_input = history[-1][0]
-    # user_intent = determine_intent(user_input)
-
-    # if user_intent == "edit":
-    #     show_accordion = True
-
-    # adv = get_accordion_content(show_accordion)
 
     history[-1][1] = ""
     print("user_input", user_input)
     k.input = user_input
     steps = ["extract_culture", "summarize_culture", "write_story", "extract_characters_from_story", "generate_character_image",
-             "break_story_into_scenes", "generate_pose", "generate_bounding_box", "generate_bb_image", "final_scene_generation","update_inpainted_image"]
+             "break_story_into_scenes", "generate_pose", "generate_bounding_box", "generate_bb_image", "final_scene_generation"]
     for step in steps:
-        if step == "update_inpainted_image":
-            while not isInpaintingComplete:
-                time.sleep(1)
         print(f"Running {step}")
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"
         for out in getattr(k, step)():
@@ -168,21 +159,6 @@ def inpainting(imgeditor, user_input, scene_number, ref_image):
     base64_output = out
     img = Image.open(io.BytesIO(base64.b64decode(out)))
 
-    # for i in range(len(images)):
-    #     image = images[i]
-    #     count += 1
-    #     out = image
-    #     base64_output.append(out)
-    #     out_pil = PIL.Image.open(io.BytesIO(base64.b64decode(out)))
-    #     output.append(out_pil)
-    #     img_data = base64.b64decode(out)
-    #     img = Image.open(io.BytesIO(img_data))
-    #     img.save(kcache(f'output_{count}.png'), 'PNG')
-
-    # print("Inpainting done, selecting best image")
-    # best_img_index = int(llm_vision(base64_output))-1
-    # best_img = base64_output[best_img_index]
-
     k.sync_scenes_in_db(base64_output, scene_index)
     
 
@@ -198,7 +174,6 @@ def inpainting(imgeditor, user_input, scene_number, ref_image):
 
     print("Gallery reloaded")
     isInpaintingComplete = True
-    # return images
 
 
 with gr.Blocks() as demo:
@@ -273,12 +248,7 @@ with gr.Blocks() as demo:
         d.change(fn=select_image, inputs=d, outputs=imgeditor)
         badv.click(fn=inpainting,
                    inputs=[imgeditor, uadv, d, op],
-                #    outputs=g
                    )
-
-    # accordion
-    # show_accordion = False
-    # adv = get_accordion_content(show_accordion)
 
 
 demo.queue()

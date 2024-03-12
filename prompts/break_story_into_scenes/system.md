@@ -12,14 +12,3 @@ Response in JSON list format without backticks:
     characters:{{"<name of character>":"<pose of character>,<face expression>"}}
   }}
 ]
-
- 
-<!-- Example
-[{{
-  "narration": "In the serene Kerala beach, Ramya and her Ammamma are happily watching the sunset.",
-  "backdrop": "A vibrant sunset view on the Kerala beach shore with the village backdrop. A few shopkeepers standing far away",
-  "characters": {{
-      "Ramya": "standing and pointing her hand towards at the sunset, excited face”,
-      "Ammamma": "sitting on sea shore and looking at the sunset, smiling face”  
-  }}
-}}] -->

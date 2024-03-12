@@ -319,6 +319,8 @@ class Kahani:
                         file_path = self.local_dir(f"scene{s}_character_{c.name}.png")
                         with open (file_path, "wb") as f:
                             f.write(base64.b64decode(c.image_pose[s]))
+                        yield "text", False, f"character image for {c.name}"
+                        yield "file", True, file_path, "character image for scene"
                         character_reference_images.append(file_path)
             names = []
             prompts = []
@@ -342,6 +344,11 @@ class Kahani:
                 conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
             print("calling controlnet here for canny bb")
             reference_canny_img = SDAPI.controlnet(init_images=[conditioned_image])
+            reference_image = reference_canny_img
+            with open(self.local_dir(f"reference_image_scene{s}.png"), "wb") as f:
+                f.write(base64.b64decode(reference_image))
+            yield "text", False, f"reference image for scene{s}"
+            yield "file", True, self.local_dir(f"reference_image_scene{s}.png"), "reference image for scene"
             
             if(len(character_reference_images) > 0):
                 first_ref_img = character_reference_images[0]
