@@ -47,7 +47,7 @@ new_img_shape = resize_to_fit_bbox(img_shape, bbox_shape)
 print("new img shape", new_img_shape)
 resized_img = img.resize((new_img_shape[1], new_img_shape[0]))
 # save the resized img
-resized_img.save("/home/deepikakhullar/YehHaiMeriKahani/tests/image_processing/outputs/bala_pose_one_crop_resized.png")
+# resized_img.save("/home/deepikakhullar/YehHaiMeriKahani/tests/image_processing/outputs/bala_pose_one_crop_resized.png")
 
 # Create a blank canvas with the desired size
 canvas = Image.new('RGB', (1280, 960), (0, 0, 0))  # Assuming a black background
@@ -59,4 +59,4 @@ canvas.save("/home/deepikakhullar/YehHaiMeriKahani/tests/image_processing/output
 
 
 # dimensions
-# {"character":"Simba", "dimensions":[650, 500, 250, 190]}
+# {"character":"Bala", "dimensions":[650, 500, 300, 560]}
