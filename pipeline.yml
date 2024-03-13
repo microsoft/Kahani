@@ -63,18 +63,9 @@ steps:
       backendAzureRmStorageAccountName: 'kahanitfstate'
       backendAzureRmContainerName: 'tfstate'
       backendAzureRmKey: 'study.tfstate'
-  - task: TerraformTaskV4@4
-    inputs:
-      provider: 'azurerm'
-      command: 'init'
-      backendServiceArm: 'KahaniDevOps'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
-      backendAzureRmResourceGroupName: 'kahani-tfstate'
-      backendAzureRmStorageAccountName: 'kahnitfstate'
-      backendAzureRmContainerName: 'tfstate'
-      backendAzureRmKey: 'study.tfstate'
     # condition: and(succeeded(), or(contains(variables.modifiedFolders, 'terraform'), contains(variables.modifiedFolders, 'server'), contains(variables.modifiedFolders, 'pbyc')))
     displayName: "Terraform Init"
+     
 
   - task: TerraformTaskV4@4
     inputs:
