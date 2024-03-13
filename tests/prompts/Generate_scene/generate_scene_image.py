@@ -99,5 +99,23 @@ class TestGenerateSceneImage(TestCase):
         with open(f"tests/prompts/Generate_scene/outputs/object_detection_final_scene.png", "wb") as f:
             f.write(img_data)
         
+    def test_new_case(self):
+        prompt = "Bala and Simba, (young boy in a vibrant t-shirt and shorts, (running with wide open arms and a big smile:1.2)), (playful pup with tongue lolling out, (tail wagging, looking up at Bala with excited eyes:1.2)), (Expansive Marina Beach, crowded with families, colorful food stalls, iconic lighthouse casting a tall shadow, wavy palm trees), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
         
+        with open("tests/prompts/Generate_scene/inputs/reference_image_scene10.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene_10_bounding_box.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene_10_bounding_box.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")    
             
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+ 
+        img_data = base64.b64decode(image_data)
+        with open(f"tests/prompts/Generate_scene/outputs/final_scene_10.png", "wb") as f:
+            f.write(img_data)
