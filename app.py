@@ -257,8 +257,6 @@ with gr.Blocks() as demo:
                     inputs=[imgeditor, uadv, d, op],
                     )
             
-        # main_interface.visible = False
-
     gr.Markdown("[Privacy & Cookies](https://privacy.microsoft.com/privacystatement) | [Trademarks](https://www.microsoft.com/trademarks) | [Terms of Use](https://go.microsoft.com/fwlink/?LinkID=206977) | © 2024 Microsoft")
 
 
