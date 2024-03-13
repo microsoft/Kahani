@@ -57,6 +57,16 @@ steps:
     inputs:
       provider: 'azurerm'
       command: 'init'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
+      backendServiceArm: 'KahaniDevOps'
+      backendAzureRmResourceGroupName: 'kahani-tfstate'
+      backendAzureRmStorageAccountName: 'kahanitfstate'
+      backendAzureRmContainerName: 'tfstate'
+      backendAzureRmKey: 'study.tfstate'
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'init'
       backendServiceArm: 'KahaniDevOps'
       workingDirectory: '$(System.DefaultWorkingDirectory)/terraform/'
       backendAzureRmResourceGroupName: 'kahani-tfstate'
