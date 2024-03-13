@@ -81,7 +81,7 @@ def bot(history):
     print("user_input", user_input)
     k.input = user_input
     steps = ["extract_culture", "summarize_culture", "write_story", "extract_characters_from_story", "generate_character_image",
-             "break_story_into_scenes", "generate_pose", "generate_bounding_box", "generate_bb_image", "final_scene_generation"]
+             "break_story_into_scenes", "generate_pose", "generate_bounding_box", "generate_scene_canvas", "final_scene_generation"]
     for step in steps:
         print(f"Running {step}")
         history[-1][1] = f"... {step.replace('_', ' ').title()} ...\n"

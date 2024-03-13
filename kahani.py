@@ -15,6 +15,7 @@ from termcolor import colored
 from utils import final_scene_generation_prompt, modify_scene_pose_generation_prompt
 from functools import partial
 from PIL import Image
+import numpy as np
 load_dotenv()
 
 
@@ -161,13 +162,14 @@ class Kahani:
                 character_prompt += chunk
                 yield "text", False, chunk
             self.db.characters[index].prompt = character_prompt
+            # yield "text", False, f"character: {character.name}"
             image = SDAPI.text2image(prompt=character_prompt, seed=0, steps=40)
             image = SDAPI.remove_background(image=image)
             if image:
                 self.db.characters[index].image = image
-                with open(self.local_dir(f"character_gen_{index}.png"), "wb") as f:
+                with open(self.local_dir(f"character_gen_{character.name}.png"), "wb") as f:
                     f.write(base64.b64decode(image))
-                yield "file", True, self.local_dir(f"character_gen_{index}.png"), character_prompt
+                yield "file", True, self.local_dir(f"character_gen_{character.name}.png"), character_prompt
             print(colored(f"character: {self.db.characters[index]}", color='blue'))
 
     def extract_characters_from_story(self):
@@ -267,7 +269,70 @@ class Kahani:
             final_image_path = self.local_dir(f"scene_{s}_bounding_box.png")
             canvas.save(final_image_path, "PNG")
             yield "file", True, final_image_path, narration
-               
+    
+    def crop_image(self, input_path):
+        print(colored('\n\ncropping image', color='blue'))
+        img = Image.open(input_path)
+        
+        # Convert the image to a numpy array
+        img_array = np.array(img)
+        
+        # Find the non-zero coordinates
+        non_zero_coords = np.argwhere(img_array != 0)
+        
+        # Get the bounding box coordinates
+        top_left = non_zero_coords.min(axis=0)
+        bottom_right = non_zero_coords.max(axis=0)
+        
+        # Extract the part of the image within the bounding box
+        cropped_image_array = img_array[top_left[0]:bottom_right[0]+1, top_left[1]:bottom_right[1]+1]
+        
+        # Convert the numpy array back to an image
+        cropped_img = Image.fromarray(cropped_image_array)
+        
+        # Save the cropped image, replacing the original image
+        cropped_img.save(input_path)
+     
+    def resize_to_fit_bbox(self, img_shape, bbox_shape):
+        # Calculate the scaling factors for each dimension
+        scale_y = bbox_shape[0] / img_shape[0]
+        scale_x = bbox_shape[1] / img_shape[1]
+
+        # Use the smaller scaling factor to maintain the aspect ratio
+        scale_factor = min(scale_y, scale_x)
+
+        # Calculate the new dimensions
+        new_height = int(img_shape[0] * scale_factor)
+        new_width = int(img_shape[1] * scale_factor)
+
+        return (new_height, new_width)   
+    
+    def generate_scene_canvas(self):
+        print(colored('\n\ngenerating scene canvas', color='blue'))
+        for s, scene in enumerate(self.db.scenes):
+            print(colored('\n\ngenerating bounding box canvas', color='blue'))
+            bounding_boxes = self.db.scenes[s].bounding_box
+            narration = self.db.scenes[s].narration
+            canvas = Image.new('RGB', (1280, 960), (0, 0, 0))
+
+            for box in bounding_boxes:
+                character = box["character"]
+                dimensions = box["dimensions"]
+                bbox_shape = dimensions[2:]
+                file_path = self.local_dir(f"scene{s}_{character}.png")
+                try:
+                    img = Image.open(file_path)
+                    img_shape = np.array(img).shape[:-1]
+                    new_img_shape = self.resize_to_fit_bbox(img_shape, bbox_shape)
+                    resized_img = img.resize((new_img_shape[1], new_img_shape[0]))
+                    canvas.paste(resized_img, (dimensions[0], dimensions[1]))
+                except FileNotFoundError:
+                    print(f"File not found: {file_path}")
+                    continue
+            final_image_path = self.local_dir(f"scene_{s}_bounding_box.png")
+            canvas.save(final_image_path, "PNG")
+            yield "file", True, final_image_path, narration
+            
     def generate_bounding_box(self):
         for s, scene in enumerate(self.db.scenes):
             print(colored('\n\ngenerating bounding box', color='blue'))
@@ -302,67 +367,113 @@ class Kahani:
                         for chunk in prompt:
                             character_pose_prompt += chunk
                             yield "text", False, chunk
+                        # yield "file", True, self.local_dir(f"character_gen_{c.name}.png"), "character_prompt"
+                        with open (self.local_dir(f"character_gen_{c.name}.png"), "rb") as f:
+                            ref_image = f.read()
+                            ref_image = base64.b64encode(ref_image).decode("utf-8")
                         self.db.characters[i].scene_prompt[s] = character_pose_prompt
-                        image_data =SDAPI.pose_generation(reference_image=c.image, prompt=character_pose_prompt, seed=0, steps=40)
+                        image_data =SDAPI.pose_generation(reference_image=ref_image, prompt=character_pose_prompt, seed=0, steps=40)
                         image_data = SDAPI.remove_background(image=image_data)
                         self.db.characters[i].image_pose[s] = image_data
                         with open(self.local_dir(f"scene{s}_{name}.png"), "wb") as f:
                             f.write(base64.b64decode(image_data))
+                        self.crop_image(self.local_dir(f"scene{s}_{name}.png"))
                         yield "file", True, self.local_dir(f"scene{s}_{name}.png"), character_pose_prompt
     
+    
     def final_scene_generation(self):
+        print(colored('\n\nfinal scene generation', color='blue'))
         for s, scene in enumerate(self.db.scenes):
-            character_reference_images = []
-            for character in scene.characters:
-                for c in self.db.characters:
-                    if c.name == character:
-                        file_path = self.local_dir(f"scene{s}_character_{c.name}.png")
-                        with open (file_path, "wb") as f:
-                            f.write(base64.b64decode(c.image_pose[s]))
-                        yield "text", False, f"character image for {c.name}"
-                        yield "file", True, file_path, "character image for scene"
-                        character_reference_images.append(file_path)
-            names = []
-            prompts = []
-            for name, action in self.db.scenes[s].characters.items():
-                for i, c in enumerate(self.db.characters):
-                    if c.name == name:
-                        names.append(name)
-                        prompts.append(c.scene_prompt[s])
-            print("this is the scene prompt taken for final scene genration", prompts)
-            prompt = final_scene_generation_prompt(names, prompts) 
-            backdrop = self.db.scenes[s].backdrop
-            narration = self.db.scenes[s].narration
-            final_prompt = GenerateScenesPrompt(characters=prompt, narration=narration, backdrop=backdrop, stream=True, callback=self.print_llm_output) 
-            full_final_prompt = ""
-            for chunk in final_prompt:
-                full_final_prompt += chunk
-            yield "text", False, full_final_prompt
-            image_path = self.local_dir(f"scene_{s}_bounding_box.png")
-            with open(image_path, "rb") as f:
-                conditioned_image = f.read()
-                conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
-            print("calling controlnet here for canny bb")
-            reference_canny_img = SDAPI.controlnet(init_images=[conditioned_image])
-            reference_image = reference_canny_img
-            with open(self.local_dir(f"reference_image_scene{s}.png"), "wb") as f:
-                f.write(base64.b64decode(reference_image))
-            yield "text", False, f"reference image for scene{s}"
+            character_reference_images = self.extract_character_images(scene, s)
+            backdrop, narration, characters = self.extract_scene_details(scene)
+            final_prompt = self.generate_final_prompt(characters, narration, backdrop)
+            reference_canny_img = self.generate_reference_image(s)
+            first_ref_img, second_ref_img = self.handle_reference_images(character_reference_images,s)
+            print(colored('\n\ngenerating final scene image for final scenes', color='blue'))
+            yield "text", False, final_prompt
             yield "file", True, self.local_dir(f"reference_image_scene{s}.png"), "reference image for scene"
+            yield "file", True, first_ref_img, "first reference image for scene"
+            yield "file", True, second_ref_img, "second reference image for scene"
             
-            if(len(character_reference_images) > 0):
-                first_ref_img = character_reference_images[0]
-            if(len(character_reference_images) > 1):  
-                second_ref_img = character_reference_images[1]
+            print("first_ref_img", first_ref_img)
+            print("second_ref_img", second_ref_img)
+            
+            with open(self.local_dir(f"reference_image_scene{s}.png"), "rb") as f:
+                final_ref = f.read()
+                final_ref = base64.b64encode(final_ref).decode("utf-8")
                 
-            # this condition is considered when there is only one character
-            if(len(character_reference_images) == 1):
-                second_ref_img = first_ref_img
-            image_data = SDAPI.reference_image(conditioned_image=reference_canny_img,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=full_final_prompt, seed=0, steps=40)
+            with open(first_ref_img, "rb") as f:
+                final_first_img= f.read()
+                final_first_img = base64.b64encode(final_first_img).decode("utf-8")
+            
+            with open(second_ref_img, "rb") as f:
+                final_second_img= f.read()
+                final_second_img = base64.b64encode(final_second_img).decode("utf-8")    
+            
+            image_data = SDAPI.reference_image(conditioned_image=final_ref, first_ref_image=final_first_img, second_ref_image=final_second_img, prompt=final_prompt)
             self.db.scenes[s].image = image_data
             with open(self.local_dir(f"final_scene{s}.png"), "wb") as f:
                 f.write(base64.b64decode(image_data))
-            yield "file", True, self.local_dir(f"final_scene{s}.png"), full_final_prompt
+            yield "file", True, self.local_dir(f"final_scene{s}.png"), "final prompt because image does not work??"
+            
+    def extract_character_images(self, scene, scene_index):
+        print(colored('\n\nextracting character images for final scenes', color='blue'))
+        character_reference_images = []
+        for character in scene.characters:
+            for c in self.db.characters:
+                if c.name == character:
+                    file_path = self.local_dir(f"scene{scene_index}_character_{c.name}.png")
+                    with open(file_path, "wb") as f:
+                        f.write(base64.b64decode(c.image_pose[scene_index]))
+                    character_reference_images.append(file_path)
+        return character_reference_images
+
+    def extract_scene_details(self, scene):
+        print(colored('\n\nextracting scene details for final scenes', color='blue'))
+        backdrop = scene.backdrop
+        narration = scene.narration
+        characters = scene.characters
+        return backdrop, narration, characters
+
+    def generate_final_prompt(self, characters, narration, backdrop):
+        print(colored('\n\ngenerating final prompt for final scenes', color='blue'))
+        final_prompt = GenerateScenesPrompt(characters=characters, narration=narration, backdrop=backdrop, stream=True, callback=self.print_llm_output)
+        full_final_prompt = ""
+        for chunk in final_prompt:
+            full_final_prompt += chunk
+        return full_final_prompt
+
+    def generate_reference_image(self, scene_index):
+        print(colored('\n\ngenerating reference image for final scenes', color='blue'))
+        image_path = self.local_dir(f"scene_{scene_index}_bounding_box.png")
+        with open(image_path, "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+        reference_canny_img = SDAPI.controlnet(init_images=[conditioned_image])
+        reference_image = reference_canny_img
+        with open(self.local_dir(f"reference_image_scene{scene_index}.png"), "wb") as f:
+            f.write(base64.b64decode(reference_image))
+        return reference_canny_img
+
+    def handle_reference_images(self, character_reference_images, scene_index):
+        print(colored('\n\nhandling reference images for final scenes', color='blue'))
+        first_ref_img = character_reference_images[0] if len(character_reference_images) > 0 else None
+        second_ref_img = character_reference_images[1] if len(character_reference_images) > 1 else first_ref_img
+        return first_ref_img, second_ref_img
+
+    def generate_final_scene_image(self, reference_canny_img, first_ref_img, second_ref_img, final_prompt, scene_index):
+        print(colored('\n\ngenerating final scene image for final scenes', color='blue'))
+        yield "text", False, "Checkingggggggggggggggggg"
+        yield "text", False, final_prompt
+        yield "file", True, reference_canny_img, "reference image for scene"
+        yield "file", True, first_ref_img, "first reference image for scene"
+        yield "file", True, second_ref_img, "second reference image for scene"
+        image_data = SDAPI.reference_image(conditioned_image=reference_canny_img, first_ref_image=first_ref_img, second_ref_image=second_ref_img, prompt=final_prompt)
+        self.db.scenes[scene_index].image = image_data
+        with open(self.local_dir(f"final_scene{scene_index}.png"), "wb") as f:
+            f.write(base64.b64decode(image_data))
+        return image_data
+
         
     def save_db(self):
         with open(self.local_dir('db.json'), 'w') as f:
