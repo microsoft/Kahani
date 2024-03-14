@@ -33,6 +33,7 @@ steps:
       command: 'buildAndPush'
       buildContext: '$(System.DefaultWorkingDirectory)'
       Dockerfile: '**/Dockerfile'
+      arguments: --build-arg VERSION=$(Build.BuildId)
     displayName: "Build Server Image"
 
   - task: Bash@3
