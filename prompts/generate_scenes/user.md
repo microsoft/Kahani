@@ -1,8 +1,11 @@
 Scene backdrop:
 {backdrop}
 
-Characters, their description and their activity in this scene:
-{characters}
+Character action
+{action}
+
+character description
+{description}
 
 Narration of Scene:
 {narration}

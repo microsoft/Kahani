@@ -119,3 +119,46 @@ class TestGenerateSceneImage(TestCase):
         img_data = base64.b64decode(image_data)
         with open(f"tests/prompts/Generate_scene/outputs/final_scene_10.png", "wb") as f:
             f.write(img_data)
+            
+    def test_only_action(self):
+        prompt = "Bala and Simba, (young boy in a traditional South Indian half-sleeve shirt and shorts (running excitedly towards the sea with a big smile:1.2)), (golden retriever (matching Bala's pace with tongue out and tail wagging:1.2)), (Marina Beach with sunrise over the ocean, Chennai cityscape in the distance, colorful kites in the sky, South Indian stalls with architectural motifs), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        
+        with open("tests/prompts/Generate_scene/inputs/reference_image_scene0.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_character_Bala.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_character_Simba.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")    
+            
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt, seed=0, steps=40)
+ 
+        img_data = base64.b64decode(image_data)
+        with open(f"tests/prompts/Generate_scene/outputs/final_scene_only_action.png", "wb") as f:
+            f.write(img_data)
+     
+            
+    def test_both_desc_action(self):
+        prompt = "Bala and Simba, ((boy in a bright yellow cotton T-shirt and navy blue shorts:1.5), (running excitedly, a big smile, short curly hair bouncing:1.2)), ((golden-furred dog with red collar:1.5), (running with tongue out, tail wagging, alert ears:1.2)), (Marina Beach at sunrise, panoramic ocean view, Chennai cityscape, sand with colorful kites, iconic palm trees, South Indian stalls with architectural motifs), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        
+        with open("tests/prompts/Generate_scene/inputs/reference_image_scene0.png", "rb") as f:
+            conditioned_image = f.read()
+            conditioned_image = base64.b64encode(conditioned_image).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_character_Bala.png", "rb") as f:
+            first_ref_img = f.read()
+            first_ref_img = base64.b64encode(first_ref_img).decode("utf-8")
+       
+        with open("tests/prompts/Generate_scene/inputs/scene0_character_Simba.png", "rb") as f:
+            second_ref_img = f.read()
+            second_ref_img = base64.b64encode(second_ref_img).decode("utf-8")    
+            
+        image_data = SDAPI.reference_image(conditioned_image=conditioned_image,first_ref_image=first_ref_img,second_ref_image=second_ref_img, prompt=prompt)
+ 
+        img_data = base64.b64decode(image_data)
+        with open(f"tests/prompts/Generate_scene/outputs/final_scene_desc_action.png", "wb") as f:
+            f.write(img_data)    
