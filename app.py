@@ -257,8 +257,9 @@ with gr.Blocks() as demo:
                     inputs=[imgeditor, uadv, d, op],
                     )
             
+    gr.Markdown(f"Kahani Version: {os.getenv('DOCKER_IMAGE_VERSION', 0)}")
     gr.Markdown("[Privacy & Cookies](https://privacy.microsoft.com/privacystatement) | [Trademarks](https://www.microsoft.com/trademarks) | [Terms of Use](https://go.microsoft.com/fwlink/?LinkID=206977) | © 2024 Microsoft")
-
+    
 
 demo.queue()
 if __name__ == "__main__":

@@ -25,8 +25,11 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 RUN mkdir outputs
 COPY prompts/ prompts
 COPY *.py .
-COPY *.png .
+COPY avatar.png .
 
 EXPOSE 8080
+
+ARG VERSION="1"
+ENV DOCKER_IMAGE_VERSION=${VERSION}
 
 CMD ["gradio", "app.py"]
