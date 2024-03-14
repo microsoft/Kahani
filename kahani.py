@@ -384,16 +384,17 @@ class Kahani:
     def final_scene_generation(self):
         print(colored('\n\nfinal scene generation', color='blue'))
         for s, scene in enumerate(self.db.scenes):
-            character_reference_images = self.extract_character_images(scene, s)
-            backdrop, narration, characters = self.extract_scene_details(scene)
-            final_prompt = self.generate_final_prompt(characters, narration, backdrop)
+            character_reference_images, description = self.extract_character_images(scene, s)
+            backdrop, narration, action = self.extract_scene_details(scene)
+            final_prompt = self.generate_final_prompt(action, narration, backdrop, description)
             reference_canny_img = self.generate_reference_image(s)
             first_ref_img, second_ref_img = self.handle_reference_images(character_reference_images,s)
             print(colored('\n\ngenerating final scene image for final scenes', color='blue'))
             yield "text", False, final_prompt
-            yield "file", True, self.local_dir(f"reference_image_scene{s}.png"), "reference image for scene"
             yield "file", True, first_ref_img, "first reference image for scene"
             yield "file", True, second_ref_img, "second reference image for scene"
+            yield "file", True, self.local_dir(f"reference_image_scene{s}.png"), "reference image for scene"
+
             
             print("first_ref_img", first_ref_img)
             print("second_ref_img", second_ref_img)
@@ -419,25 +420,30 @@ class Kahani:
     def extract_character_images(self, scene, scene_index):
         print(colored('\n\nextracting character images for final scenes', color='blue'))
         character_reference_images = []
+        character_descriptions = []
         for character in scene.characters:
             for c in self.db.characters:
                 if c.name == character:
+                    name = c.name
+                    description = c.description
+                    character_details = {"name": name, "description": description}
+                    character_descriptions.append(character_details)
                     file_path = self.local_dir(f"scene{scene_index}_character_{c.name}.png")
                     with open(file_path, "wb") as f:
                         f.write(base64.b64decode(c.image_pose[scene_index]))
                     character_reference_images.append(file_path)
-        return character_reference_images
+        return character_reference_images, character_descriptions
 
     def extract_scene_details(self, scene):
         print(colored('\n\nextracting scene details for final scenes', color='blue'))
         backdrop = scene.backdrop
         narration = scene.narration
-        characters = scene.characters
-        return backdrop, narration, characters
+        action = scene.characters
+        return backdrop, narration, action
 
-    def generate_final_prompt(self, characters, narration, backdrop):
+    def generate_final_prompt(self, action, narration, backdrop, description):
         print(colored('\n\ngenerating final prompt for final scenes', color='blue'))
-        final_prompt = GenerateScenesPrompt(characters=characters, narration=narration, backdrop=backdrop, stream=True, callback=self.print_llm_output)
+        final_prompt = GenerateScenesPrompt(action=action, narration=narration, backdrop=backdrop, description=description, stream=True, callback=self.print_llm_output)
         full_final_prompt = ""
         for chunk in final_prompt:
             full_final_prompt += chunk
@@ -463,7 +469,6 @@ class Kahani:
 
     def generate_final_scene_image(self, reference_canny_img, first_ref_img, second_ref_img, final_prompt, scene_index):
         print(colored('\n\ngenerating final scene image for final scenes', color='blue'))
-        yield "text", False, "Checkingggggggggggggggggg"
         yield "text", False, final_prompt
         yield "file", True, reference_canny_img, "reference image for scene"
         yield "file", True, first_ref_img, "first reference image for scene"
@@ -483,12 +488,6 @@ class Kahani:
         self.db.scenes[index].image = image
         self.save_db()
         print(f"-------- scene {index} synced ----------")
-        
-    def update_inpainted_image(self):
-        print(colored('\n\nupdating inpainted image', color='blue'))
-        
-        yield "file", True, self.local_dir(f"final_scene0.png"),"final scene 0"
-        yield "file", True, self.local_dir(f"final_scene1.png"),"final scene 1"
     
     
     
