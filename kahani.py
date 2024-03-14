@@ -367,7 +367,6 @@ class Kahani:
                         for chunk in prompt:
                             character_pose_prompt += chunk
                             yield "text", False, chunk
-                        # yield "file", True, self.local_dir(f"character_gen_{c.name}.png"), "character_prompt"
                         with open (self.local_dir(f"character_gen_{c.name}.png"), "rb") as f:
                             ref_image = f.read()
                             ref_image = base64.b64encode(ref_image).decode("utf-8")
