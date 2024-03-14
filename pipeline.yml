@@ -30,11 +30,17 @@ steps:
     inputs:
       containerRegistry: 'KahaniDockerRegistry'
       repository: 'kahani-streaming'
-      command: 'buildAndPush'
-      buildContext: '$(System.DefaultWorkingDirectory)'
+      command: 'build'
       Dockerfile: '**/Dockerfile'
-      arguments: --build-arg VERSION=$(Build.BuildId)
-    displayName: "Build Server Image"
+      arguments: '--build-arg VERSION=$(Build.BuildId)'
+    displayName: "Build Docker Image"
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'KahaniDockerRegistry'
+      repository: 'kahani-streaming'
+      command: 'push'
+    displayName: "Push Docker Image"
 
   - task: Bash@3
     inputs:
