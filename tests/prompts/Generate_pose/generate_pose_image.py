@@ -106,6 +106,22 @@ class TestGeneratePoseImage(TestCase):
             # print(out)
             img_data = base64.b64decode(out)
             with open(f"simba_token.png", "wb") as f:
+                f.write(img_data)
+                
+    
+    def test_duplicate_char(self):
+        prompt = "(full body:1.5), boy from Chennai beach, 10, light brown, in bright yellow T-shirt, navy blue shorts, short messy black hair, seated on the sand, (sharing sundal:1.5) in the beach environment, (happy and content:1.5), (Kids illustration, Pixar style:1.2), masterpiece, sharp focus, highly detailed, cartoon"
+        
+        file_name = "tests/prompts/Generate_pose/inputs/character_gen_Bala.png"
+        with open(file_name, "rb") as f:
+            img_data = f.read()
+            img_data = base64.b64encode(img_data).decode("utf-8")
+            out = SDAPI.pose_generation(reference_image=img_data, prompt=prompt, seed=0, steps=40)
+            out = SDAPI.remove_background(image=out)
+
+            # print(out)
+            img_data = base64.b64decode(out)
+            with open(f"tests/prompts/Generate_pose/outputs/scene_Bala_test.png", "wb") as f:
                 f.write(img_data)  
         
 

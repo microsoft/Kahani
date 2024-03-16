@@ -324,7 +324,7 @@ class SDAPI:
         if "steps" not in kwargs:
             kwargs["steps"] = 40
  
-        # kwargs['sd_model_hash'] = "31e35c80fc"
+        kwargs['sd_model_hash'] = "31e35c80fc"
         kwargs['sd_model_name'] = "sd_xl_base_1.0"
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
@@ -340,14 +340,16 @@ class SDAPI:
             {
                 "enabled": True,
                 "weight": 1.0,
-                "preprocessor": "reference_only",
+                "module": "reference_only",
                 "image": reference_image,
-                "resize_mode": 0,
+                "resize_mode": "Just Resize",
                 "lowvram": False,
+                "threshold_a":0.5,
                 "guidance_start": 0.0,
                 "guidance_end": 1.0,
-                "control_mode": 0,
-                "pixel_perfect": True,
+                "control_mode": "Balanced",
+                "pixel_perfect": False,
+                
             }
         ]
         response = requests.post(HOST + "/sdapi/v1/txt2img", json=kwargs)
