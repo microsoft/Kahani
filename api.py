@@ -9,10 +9,13 @@ load_dotenv()
 
 
 HOST = os.environ.get("SDAPI_HOST")
-STANDARD_WIDTH = 1280
-STANDARD_HEIGHT = 960
+STANDARD_WIDTH = 512 #1280
+STANDARD_HEIGHT = 512 #960
 NEGATIVE_PROMPT ="EasyNegative, blurry, (bad_prompt:0.8), (artist name, signature, watermark:1.4), (ugly:1.2), (worst quality, poor detail:1.4), (deformed iris, deformed pupils, semi-realistic, CGI, 3d, render, sketch, drawing, anime:1.4), text, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, lowres, error, worst quality, low quality, out of frame, username, NSFW"
-
+# T2I_MODEL_NAME = "sd_xl_base_1.0"
+# T2I_MODEL_HASH = "31e35c80fc"
+T2I_MODEL_NAME = "sd_xl_turbo_1.0"
+T2I_MODEL_HASH = "2e58e3704b"
 
 class SDAPI:
 
@@ -28,10 +31,10 @@ class SDAPI:
             kwargs["seed"] = -1
 
         if "steps" not in kwargs:
-            kwargs["steps"] = 40
+            kwargs["steps"] = 4 #40
 
-        # kwargs['sd_model_hash'] = "31e35c80fc"
-        kwargs['sd_model_name'] = "sd_xl_base_1.0"
+        # kwargs['sd_model_hash'] = T2I_MODEL_HASH
+        kwargs['sd_model_name'] = T2I_MODEL_NAME
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         # kwargs['sd_vae_hash'] = None
         # kwargs['sd_vae_name'] = "sdxl_vae"
@@ -235,8 +238,8 @@ class SDAPI:
         if "steps" not in kwargs:
             kwargs["steps"] = 40
 
-        kwargs['sd_model_hash'] = "31e35c80fc"
-        kwargs['sd_model_name'] = "sd_xl_base_1.0"
+        kwargs['sd_model_hash'] = T2I_MODEL_HASH
+        kwargs['sd_model_name'] = T2I_MODEL_NAME
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
 
@@ -324,8 +327,8 @@ class SDAPI:
         if "steps" not in kwargs:
             kwargs["steps"] = 40
  
-        kwargs['sd_model_hash'] = "31e35c80fc"
-        kwargs['sd_model_name'] = "sd_xl_base_1.0"
+        kwargs['sd_model_hash'] = T2I_MODEL_HASH
+        kwargs['sd_model_name'] = T2I_MODEL_NAME
         kwargs['sampler_name'] = "DPM++ 2M Karras"
         kwargs['negative_prompt'] = NEGATIVE_PROMPT
  
