@@ -23,7 +23,7 @@ $ vi .env
 # SDAPI_HOST=http://172.17.0.1:7860
 # OPENAI_API_KEY=<OPENAI_API_KEY>
 $ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
-
+```
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
