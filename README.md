@@ -81,12 +81,6 @@ $ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
     │       ├── system.md
     │       └── user.md
     ├── pyproject.toml
-    ├── terraform
-    │   ├── README.md
-    │   ├── backend.tf
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   └── webapp.tf
     └── utils.py
 ```
 
