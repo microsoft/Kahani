@@ -8,12 +8,20 @@ Large Language Models (LLMs) and Text-To-Image (T2I) models have demonstrated th
 
 ## Developer Notes:
 
+Follow the given commands to setup and run this project and install necessary packages.
+
 ```
+# Build the docker image
 $ docker build . -t kahani-streaming
+
+# Set up the environment variables
 $ touch .env
 $ vi .env
+# Paste the below two env variables in the .env file and replace it with your API key and endpoint
 # SDAPI_HOST=http://172.17.0.1:7860
 # OPENAI_API_KEY=<OPENAI_API_KEY>
+
+# To run the docker container from the built docker image
 $ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
 ```
 ## Directory Structure
