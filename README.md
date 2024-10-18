@@ -108,12 +108,12 @@ Our proposed visual storytelling pipeline consists of five primary steps startin
     └── utils.py
 ```
 
-## Citation
+<!-- ## Citation -->
 
-In case you use this work or pipeline, please cite our work,
+<!-- In case you use this work or pipeline, please cite our work,-->
 
-```
-```
+<!-- ```-->
+<!-- ```-->
 
 ## Contributing
 
