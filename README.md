@@ -22,75 +22,72 @@ $ docker run -it -d -p 8080:8080 --env-file .env kahani-streaming
 
 ```
 .
-├── CODE_OF_CONDUCT.md
-├── Dockerfile
-├── LICENSE
 ├── README.md
-├── SECURITY.md
-├── SUPPORT.md
-├── api.py
-├── app.py
-├── avatar.png
-├── kahani.py
-├── llm.py
-├── models.py
-├── pipeline.yml
-├── poetry.lock
-├── prompts
-│   ├── __init__.py
-│   ├── base.py
-│   ├── bounding_box
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── break_story_into_scenes
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── classify_change
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── create_story
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── extract_characters
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── extract_culture
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── generate_character
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── generate_pose
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── generate_scenes
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   ├── summarise_culture
-│   │   ├── __init__.py
-│   │   ├── system.md
-│   │   └── user.md
-│   └── user_input
-│       ├── __init__.py
-│       ├── system.md
-│       └── user.md
-├── pyproject.toml
-├── terraform
-│   ├── README.md
-│   ├── backend.tf
-│   ├── main.tf
-│   ├── variables.tf
-│   └── webapp.tf
-└── utils.py
+└── src
+    ├── Dockerfile
+    ├── api.py
+    ├── app.py
+    ├── avatar.png
+    ├── kahani.py
+    ├── llm.py
+    ├── models.py
+    ├── pipeline.yml
+    ├── poetry.lock
+    ├── prompts
+    │   ├── __init__.py
+    │   ├── base.py
+    │   ├── bounding_box
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── break_story_into_scenes
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── classify_change
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── create_story
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── extract_characters
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── extract_culture
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── generate_character
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── generate_pose
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── generate_scenes
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   ├── summarise_culture
+    │   │   ├── __init__.py
+    │   │   ├── system.md
+    │   │   └── user.md
+    │   └── user_input
+    │       ├── __init__.py
+    │       ├── system.md
+    │       └── user.md
+    ├── pyproject.toml
+    ├── terraform
+    │   ├── README.md
+    │   ├── backend.tf
+    │   ├── main.tf
+    │   ├── variables.tf
+    │   └── webapp.tf
+    └── utils.py
 ```
 
 ## Citation
