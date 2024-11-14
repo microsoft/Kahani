@@ -1,4 +1,0 @@
-*.tfbackend
-*.tfvars
-.terraform*
-plan
