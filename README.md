@@ -1,6 +1,6 @@
 # Kahani : Culturally-Nuanced Visual Storytelling Pipeline for Non-Western Cultures
 
-#### Official Repository for "Kahani : Culturally-Nuanced Visual Storytelling Pipeline for Non-Western Cultures"
+#### Official Repository for ["Kahani : Culturally-Nuanced Visual Storytelling Pipeline for Non-Western Cultures"](https://arxiv.org/abs/2410.19419).
 
 ## Abstract
 
