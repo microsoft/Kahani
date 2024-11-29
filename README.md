@@ -108,12 +108,21 @@ Our proposed visual storytelling pipeline consists of five primary steps startin
     └── utils.py
 ```
 
-<!-- ## Citation -->
+## Citation
 
-<!-- In case you use this work or pipeline, please cite our work,-->
+In case you use this work or pipeline, please use the following bibTEX to cite our work,
 
-<!-- ```-->
-<!-- ```-->
+```
+@misc{hamna2024kahaniculturallynuancedvisualstorytelling,
+      title={KAHANI: Culturally-Nuanced Visual Storytelling Pipeline for Non-Western Cultures}, 
+      author={Hamna and Deepthi Sudharsan and Agrima Seth and Ritvik Budhiraja and Deepika Khullar and Vyshak Jain and Kalika Bali and Aditya Vashistha and Sameer Segal},
+      year={2024},
+      eprint={2410.19419},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2410.19419}, 
+}
+```
 
 ## Contributing
 
