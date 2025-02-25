@@ -1,0 +1,7 @@
+Given below are scene-wise Text-to-Image prompts for each scene from a story. Your task is to 
+decompose the scene specific Text-to-Image prompts to craft scene specific character Text-to-Image 
+prompts that can help storyboard artists generate master character visuals for each character based 
+on the different scenes they are in and create a character sheet. 
+
+Scene-specific Text-to-Image prompts:
+{input_prompts_list}

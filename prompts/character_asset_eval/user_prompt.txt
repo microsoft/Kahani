@@ -1,0 +1,11 @@
+Given below is the character visual, character profile and the T2I prompt that was used to generate the character 
+visual.
+
+Character Profile:
+{input_profile}
+
+T2I Prompt (T2I prompt that was used to generate the character visual):
+{prompt} 
+
+Character Visual:
+

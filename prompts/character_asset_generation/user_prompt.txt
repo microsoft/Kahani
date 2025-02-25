@@ -1,0 +1,7 @@
+Given below are character profiles of each character from a user's story. Your task is to generate 
+good Text-to-Image prompts for each character that can be used by Text-to-Image models to generate 
+accurate character visuals that are culturally rich and reflect the visual attributes and descriptions 
+of the characters from their character profile and the culture and location the characters are from.
+
+Character Profiles:
+{input_character_profiles}

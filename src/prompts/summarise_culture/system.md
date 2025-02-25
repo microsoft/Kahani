@@ -1,1 +1,0 @@
-Remove unwanted lines or words that are not relevant for extracting culture from the content.

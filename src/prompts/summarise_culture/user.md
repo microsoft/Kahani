@@ -1,1 +1,0 @@
-{cultural_context}

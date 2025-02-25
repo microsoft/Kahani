@@ -1,0 +1,10 @@
+Given below are the scenes for each module/storyboard, with additional information such as title, 
+characters present in the scene, setting details, visual elements, mood and description. Your task is to generate 
+good Text-to-Image prompts for each scene that can be used by Text-to-Image models to generate accurate scene visuals 
+that are culturally rich and portray the scenes and the emotions conveyed accurately.
+
+Character Profiles:
+{input_character_profiles}
+
+Input :
+{input_scenes} 

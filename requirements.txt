@@ -1,0 +1,28 @@
+huggingface_hub==0.26.0
+python-dotenv==1.0.1
+diffusers==0.31.0
+transformers==4.45.2
+torch==2.5.0
+torchaudio==2.5.0
+torchvision==0.20.0
+accelerate==1.0.1
+sentencepiece==0.2.0
+protobuf==4.25.5
+datasets==3.0.1
+azure-identity==1.19.0
+pillow==11.0.0
+# long prompt handling in t2i
+torchao --extra-index-url https://download.pytorch.org/whl/cu121
+git+https://github.com/xhinker/sd_embed.git@main
+matplotlib==3.9.3
+replicate==1.0.4
+#websurferagent
+# autogen-agentchat~=0.2
+
+# Custom Idea2IMG
+# azure-identity
+# langchain-openai
+# opencv-python
+# torchvision
+# torchaudio
+# xformers

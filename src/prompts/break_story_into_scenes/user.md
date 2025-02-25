@@ -1,5 +1,0 @@
-Story:
-{story}
-
-characters:
-{characters}
