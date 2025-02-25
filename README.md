@@ -31,5 +31,6 @@ git config --global user.name "Your Name"
 1. Install pip and python in your system. To install (Linux), run `sudo apt install python3-pip`
 2. Clone this repository and install all the python packages from requirements using `python3 -m pip install -r requirements.txt` in your CLI.
 3. Create a `.env` file inside the project directory and paste the contents of the `env_template.txt` file and modify the values with your personal credentials. You would require `REPLICATE API TOKEN` and Azure OpenAI endpoint and Managed Identity Client ID.
-4. Now, to run the code, set the story-title to any story from the `data` folder and simply run `python3 kahani-visuals.py`. An `outputs` folder will be created with a sub-folder specific to your story with all the generated outputs.
+4. Create a `data` folder within this project repo with a sub-folder (named after the story-title) and add your story generation outputs to this sub-folder.
+5. Now, to run the code, set the story-title to any story from the `data` folder and simply run `python3 kahani-visuals.py`. An `outputs` folder will be created with a sub-folder specific to your story with all the generated outputs.
 
